@@ -136,16 +136,13 @@ export function ResumePreviewClassic() {
   return (
     <div 
       id="resume-preview" 
-      className="page-preview bg-white text-gray-800 shadow-2xl font-sans"
+      className="page-preview bg-white text-gray-800 shadow-2xl font-sans md:origin-top"
       style={{
         '--scale-factor': '0.7',
         width: 'calc(210mm * var(--scale-factor))',
         minHeight: 'calc(297mm * var(--scale-factor))',
         transform: 'scale(var(--scale-factor))',
         transformOrigin: 'top center',
-        padding: 'calc(16mm * var(--scale-factor))',
-        boxSizing: 'border-box',
-        fontSize: 'calc(10pt * var(--scale-factor))',
       } as React.CSSProperties}
     >
        <div className="a4-content-container" style={{
