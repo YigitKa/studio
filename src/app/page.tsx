@@ -7,7 +7,6 @@ import ResumeEditor from "@/components/resume-editor";
 import ResumePreview from "@/components/resume-preview";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useResume } from "@/contexts/resume-context";
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,7 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export default function Home() {
   const [activeTab, setActiveTab] = useState("editor");
   const isMobile = useIsMobile();
-  const [zoom, setZoom] = useState(isMobile ? 0.5 : 0.7);
+  const [zoom, setZoom] = useState(isMobile ? 0.4 : 0.7);
 
   const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 1.5));
   const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.2));

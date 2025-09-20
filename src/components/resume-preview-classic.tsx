@@ -140,14 +140,14 @@ export function ResumePreviewClassic({ zoom }: { zoom: number }) {
       style={{
         '--scale-factor': zoom,
         width: 'calc(210mm * var(--scale-factor))',
-        minHeight: 'calc(297mm * var(--scale-factor))',
+        height: 'calc(297mm * var(--scale-factor))',
         transform: 'scale(var(--scale-factor))',
         transformOrigin: 'top center',
       } as React.CSSProperties}
     >
        <div className="a4-content-container" style={{
             width: '210mm',
-            minHeight: '297mm',
+            height: '297mm',
             padding: '16mm',
             boxSizing: 'border-box',
             fontSize: '10pt',
