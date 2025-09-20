@@ -13,11 +13,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
       }
     };
 
-    React.useEffect(() => {
-      if (internalRef.current) {
-        adjustHeight();
-      }
+    // Use effect to adjust height on initial render and when value changes externally
+    React.useLayoutEffect(() => {
+      adjustHeight();
     }, [props.value]);
+
 
     const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
       adjustHeight();
