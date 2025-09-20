@@ -2,11 +2,12 @@
 
 import { useResume } from "@/contexts/resume-context";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { GripVertical, Plus, Sparkles, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Sparkles, Trash2, ChevronDown } from "lucide-react";
 import { PhotoUploader } from "./photo-uploader";
 import { useTransition, useState, useEffect } from "react";
 import { enhanceSectionAction } from "@/app/actions";
@@ -14,27 +15,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "./ui/switch";
 import type { ResumeSection, ResumeSettings } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { DndContext, closestCenter, DragEndEvent, useSensor, useSensors, PointerSensor, TouchSensor } from "@dnd-kit/core";
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
-
-const SectionHeader = ({ title, sectionKey, onToggle }: { title: string; sectionKey: keyof ResumeSettings; onToggle: (section: keyof ResumeSettings) => void; }) => {
-  const { resumeData } = useResume();
-  return (
-    <div className="flex items-center justify-between w-full">
-      <CardTitle>{title}</CardTitle>
-      <div className="flex items-center gap-2 pr-2">
-        <Switch
-          checked={resumeData.settings[sectionKey]}
-          onCheckedChange={() => onToggle(sectionKey)}
-          aria-label={`Toggle ${title} section`}
-        />
-      </div>
-    </div>
-  );
-};
-
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ProfileEditor = () => {
     const { resumeData, setResumeData, t } = useResume();
@@ -165,7 +150,7 @@ const ExperienceEditor = () => {
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
-                      <span className="pr-4 text-left">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                      <span className="pr-4 text-left whitespace-normal">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -251,7 +236,7 @@ const EducationEditor = () => {
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
-                      <span className="pr-4 text-left">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                      <span className="pr-4 text-left whitespace-normal">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -350,7 +335,7 @@ const ProjectsEditor = () => {
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
-                        <span className="pr-4 text-left">{proj.name || t('projectName')}</span>
+                        <span className="pr-4 text-left whitespace-normal">{proj.name || t('projectName')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -483,7 +468,7 @@ const CustomSectionsEditor = () => {
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
-                        <span className="pr-4 text-left">{sec.title || t('sectionTitle')}</span>
+                        <span className="pr-4 text-left whitespace-normal">{sec.title || t('sectionTitle')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -510,103 +495,174 @@ const CustomSectionsEditor = () => {
     )
 }
 
-const sectionComponents: Record<ResumeSection, React.ReactNode> = {
-  profile: <ProfileEditor/>,
-  summary: <SummaryEditor/>,
-  experience: <ExperienceEditor/>,
-  education: <EducationEditor/>,
-  projects: <ProjectsEditor/>,
-  skills: <SkillsEditor/>,
-  customSections: <CustomSectionsEditor/>,
+type SectionEditorProps = {
+    id: ResumeSection;
+    openSections: string[];
+    onToggle: (id: string) => void;
 };
 
-const sectionTitles: Record<ResumeSection, string> = {
-    profile: "profile",
-    summary: "summary",
-    experience: "experience",
-    education: "education",
-    projects: "projects",
-    skills: "skills",
-    customSections: "customSections",
-};
+const SectionEditor: React.FC<SectionEditorProps> = ({ id, openSections, onToggle }) => {
+    const { setResumeData, t } = useResume();
+    const isOpen = openSections.includes(id);
 
-const SortableSection = ({ id }: { id: ResumeSection }) => {
-  const { setResumeData, t } = useResume();
+    const sectionComponents: Record<ResumeSection, React.ReactNode> = {
+        profile: <ProfileEditor/>,
+        summary: <SummaryEditor/>,
+        experience: <ExperienceEditor/>,
+        education: <EducationEditor/>,
+        projects: <ProjectsEditor/>,
+        skills: <SkillsEditor/>,
+        customSections: <CustomSectionsEditor/>,
+    };
+
+    const sectionTitles: Record<ResumeSection, string> = {
+        profile: "profile",
+        summary: "summary",
+        experience: "experience",
+        education: "education",
+        projects: "projects",
+        skills: "skills",
+        customSections: "customSections",
+    };
+
+    const handleToggleSection = (section: keyof ResumeSettings) => {
+        setResumeData(prev => ({
+        ...prev,
+        settings: {
+            ...prev.settings,
+            [section]: !prev.settings[section],
+        },
+        }));
+    };
+
+    return (
+        <Card>
+            <Collapsible open={isOpen} onOpenChange={() => onToggle(id)}>
+                <CardHeader className="relative">
+                    <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-1 md:gap-2">
+                            <button className="text-muted-foreground cursor-grab p-2">
+                                <GripVertical />
+                            </button>
+                            <CollapsibleTrigger asChild>
+                                <button className="flex items-center gap-1 md:gap-2">
+                                    <CardTitle>{t(sectionTitles[id])}</CardTitle>
+                                    <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                            </CollapsibleTrigger>
+                        </div>
+                        <div className="flex items-center gap-2 pr-2">
+                            <Switch
+                                checked={useResume().resumeData.settings[id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings]}
+                                onCheckedChange={() => handleToggleSection(id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings)}
+                                aria-label={`Toggle ${t(sectionTitles[id])} section`}
+                            />
+                        </div>
+                    </div>
+                </CardHeader>
+                <CollapsibleContent>
+                    {sectionComponents[id]}
+                </CollapsibleContent>
+            </Collapsible>
+        </Card>
+    )
+}
+
+const SortableSection = ({ id, openSections, onToggle }: { id: ResumeSection, openSections: string[], onToggle: (id: string) => void }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
-
-  const handleToggleSection = (section: keyof ResumeSettings) => {
-    setResumeData(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        [section]: !prev.settings[section],
-      },
-    }));
-  };
   
   return (
-    <div ref={setNodeRef} style={style} className="touch-none">
-      <Card>
-        <CardHeader className="relative">
-        <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-                <button {...attributes} {...listeners} className="text-muted-foreground cursor-grab p-2">
-                    <GripVertical />
-                </button>
-                <CardTitle>{t(sectionTitles[id])}</CardTitle>
-            </div>
-            <div className="flex items-center gap-2 pr-2">
-                <Switch
-                checked={useResume().resumeData.settings[id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings]}
-                onCheckedChange={() => handleToggleSection(id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings)}
-                aria-label={`Toggle ${t(sectionTitles[id])} section`}
-                />
-            </div>
-        </div>
-        </CardHeader>
-        {sectionComponents[id]}
-      </Card>
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
+       <SectionEditor id={id} openSections={openSections} onToggle={onToggle} />
     </div>
   );
 };
 
 
+const ClientOnlyDndProvider = ({ children, onDragEnd, onDragStart, onDragCancel }: { children: React.ReactNode, onDragEnd: (event: DragEndEvent) => void, onDragStart: () => void, onDragCancel: () => void }) => {
+    const isMobile = useIsMobile();
+    const sensors = useSensors(
+      useSensor(PointerSensor),
+      useSensor(TouchSensor)
+    );
+
+    if (typeof window === 'undefined') {
+        return <>{children}</>;
+    }
+
+    return (
+        <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={onDragEnd}
+            onDragStart={onDragStart}
+            onDragCancel={onDragCancel}
+            modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+        >
+            {children}
+        </DndContext>
+    );
+};
+
 const DraggableResumeEditor = () => {
     const { resumeData, setResumeData } = useResume();
-  
-    const onDragEnd = (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (over && active.id !== over.id) {
-        setResumeData((prev) => {
-            const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
-            const newIndex = prev.sections.indexOf(over.id as ResumeSection);
-            return { ...prev, sections: arrayMove(prev.sections, oldIndex, newIndex) };
-        });
-      }
+    const isMobile = useIsMobile();
+    const [openSections, setOpenSections] = useState<string[]>(resumeData.sections);
+    const [isDragging, setIsDragging] = useState(false);
+
+    useEffect(() => {
+        if (!isDragging) {
+            setOpenSections(resumeData.sections);
+        }
+    }, [isDragging, resumeData.sections]);
+
+    const handleToggle = (id: string) => {
+        setOpenSections(prev => 
+            prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+        );
+    };
+
+    const handleDragStart = () => {
+        if (isMobile) {
+            setIsDragging(true);
+            setOpenSections([]);
+        }
+    };
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        setIsDragging(false);
+        const { active, over } = event;
+        if (over && active.id !== over.id) {
+            setResumeData((prev) => {
+                const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
+                const newIndex = prev.sections.indexOf(over.id as ResumeSection);
+                return { ...prev, sections: arrayMove(prev.sections, oldIndex, newIndex) };
+            });
+        }
+    };
+    
+    const handleDragCancel = () => {
+        setIsDragging(false);
     };
   
     return (
-       <DndContext
-        collisionDetection={closestCenter}
-        onDragEnd={onDragEnd}
-        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-      >
+       <ClientOnlyDndProvider onDragEnd={handleDragEnd} onDragStart={handleDragStart} onDragCancel={handleDragCancel}>
         <SortableContext
           items={resumeData.sections}
           strategy={verticalListSortingStrategy}
         >
           <div className="space-y-6">
             {resumeData.sections.map((sectionId) => (
-                <SortableSection key={sectionId} id={sectionId}/>
+                <SortableSection key={sectionId} id={sectionId} openSections={openSections} onToggle={handleToggle} />
             ))}
           </div>
         </SortableContext>
-      </DndContext>
+      </ClientOnlyDndProvider>
     )
 }
 
@@ -618,7 +674,6 @@ export default function ResumeEditor() {
   }, []);
 
   if (!isClient) {
-    // Render a static version on the server to avoid hydration errors
     return (
         <div className="space-y-6">
             {initialSections.map((sectionId) => (
@@ -636,3 +691,5 @@ export default function ResumeEditor() {
 }
 
 const initialSections: ResumeSection[] = ['profile', 'summary', 'experience', 'education', 'projects', 'skills', 'customSections'];
+
+    
