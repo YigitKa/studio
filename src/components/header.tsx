@@ -38,6 +38,8 @@ export default function Header() {
             <SelectContent>
               <SelectItem value="modern">Modern</SelectItem>
               <SelectItem value="classic">Classic</SelectItem>
+              <SelectItem value="creative">Creative</SelectItem>
+              <SelectItem value="minimalist">Minimalist</SelectItem>
             </SelectContent>
           </Select>
         </div>
