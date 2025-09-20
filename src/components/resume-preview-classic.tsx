@@ -5,15 +5,33 @@ import * as React from "react";
 import { useResume } from "@/contexts/resume-context";
 import type { ResumeData, ResumeSection } from "@/lib/types";
 
-const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) => {
+const SectionRenderer: React.FC<{ sectionId: ResumeSection, allSections: ResumeSection[] }> = ({ sectionId, allSections }) => {
     const { resumeData, t } = useResume();
     const { profile, summary, experience, education, skills, projects, customSections, settings } = resumeData;
+
+    const isVisible = (sectionId: ResumeSection) => {
+        const sectionData = resumeData[sectionId as keyof ResumeData];
+        const settingsKey = `show${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}` as keyof typeof resumeData.settings;
+        
+        let isShown = true;
+        if (sectionId !== 'profile') {
+            isShown = !!resumeData.settings[settingsKey];
+        }
+
+        if (!isShown) return false;
+
+        if (Array.isArray(sectionData) && sectionData.length === 0) return false;
+        if (typeof sectionData === 'string' && !sectionData) return false;
+        if (sectionId === 'customSections' && resumeData.customSections.every(s => !s.content)) return false;
+
+        return true;
+    }
 
     const renderContent = () => {
         switch (sectionId) {
             case 'profile':
-                return settings.showProfile && (
-                    <header data-section-id="profile" className="text-center mb-6 break-inside-avoid">
+                return (
+                    <header ref={el => sectionRefs.current[sectionId] = el} data-section-id="profile" className="text-center mb-6 break-inside-avoid">
                         {profile.photoUrl && <img src={profile.photoUrl} alt={profile.name} className="w-24 h-24 rounded-full mx-auto mb-4 object-cover" />}
                         <h1 className="text-4xl font-bold tracking-wider">{profile.name}</h1>
                         <p className="text-lg font-medium text-gray-700 mt-1">{profile.title}</p>
@@ -28,15 +46,15 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                     </header>
                 );
             case 'summary':
-                return settings.showSummary && summary && (
-                    <section data-section-id="summary" className="mb-6 break-inside-avoid">
+                return (
+                    <section ref={el => sectionRefs.current[sectionId] = el} data-section-id="summary" className="mb-6 break-inside-avoid">
                         <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{t('summary')}</h2>
                         <p className="text-sm leading-relaxed">{summary}</p>
                     </section>
                 );
             case 'experience':
-                return settings.showExperience && experience.length > 0 && (
-                    <section data-section-id="experience" className="mb-6 break-inside-avoid">
+                return (
+                    <section ref={el => sectionRefs.current[sectionId] = el} data-section-id="experience" className="mb-6 break-inside-avoid">
                         <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{t('experience')}</h2>
                         <div className="space-y-4">
                             {experience.map(exp => (
@@ -58,8 +76,8 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                     </section>
                 );
             case 'education':
-                 return settings.showEducation && education.length > 0 && (
-                    <section data-section-id="education" className="mb-6 break-inside-avoid">
+                 return (
+                    <section ref={el => sectionRefs.current[sectionId] = el} data-section-id="education" className="mb-6 break-inside-avoid">
                         <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{t('education')}</h2>
                         <div className="space-y-2">
                             {education.map(edu => (
@@ -78,8 +96,8 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                     </section>
                 );
             case 'projects':
-                return settings.showProjects && projects.length > 0 && (
-                    <section data-section-id="projects" className="mb-6 break-inside-avoid">
+                return (
+                    <section ref={el => sectionRefs.current[sectionId] = el} data-section-id="projects" className="mb-6 break-inside-avoid">
                         <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{t('projects')}</h2>
                         <div className="space-y-4">
                             {projects.map(proj => (
@@ -97,8 +115,8 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                     </section>
                 );
             case 'customSections':
-                return settings.showCustomSections && customSections.length > 0 && customSections.some(s => s.content) && (
-                     <div data-section-id="customSections">
+                return (
+                     <div ref={el => sectionRefs.current[sectionId] = el} data-section-id="customSections">
                         {customSections.map(sec => sec.content && (
                             <section key={sec.id} className="mb-6 break-inside-avoid">
                                 <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{sec.title}</h2>
@@ -111,8 +129,8 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                 );
             case 'skills':
                  const skillColumns = Array.from({ length: 3 }, (_, i) => skills.filter((__, index) => index % 3 === i));
-                 return settings.showSkills && skills.length > 0 && (
-                    <section data-section-id="skills" className="break-inside-avoid">
+                 return (
+                    <section ref={el => sectionRefs.current[sectionId] = el} data-section-id="skills" className="break-inside-avoid">
                         <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{t('skills')}</h2>
                         <div className="grid grid-cols-3 gap-x-8">
                             {skillColumns.map((column, colIndex) => (
@@ -129,6 +147,12 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
                 return null;
         }
     };
+    
+    const sectionRefs = React.useRef<Record<string, HTMLElement | null>>({});
+
+    if (!isVisible(sectionId)) {
+        return null;
+    }
 
     return renderContent();
 };
@@ -136,36 +160,89 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
 export function ResumePreviewClassic() {
     const { resumeData } = useResume();
     const [isClient, setIsClient] = React.useState(false);
+    const [pages, setPages] = React.useState<React.ReactNode[]>([]);
+    const contentRef = React.useRef<HTMLDivElement>(null);
+    const A4_HEIGHT_PX = 1123; // 297mm at 96 DPI
+    const PADDING_PX = 60; // Approximate padding
+    const MAX_CONTENT_HEIGHT = A4_HEIGHT_PX - PADDING_PX * 2;
+
 
     React.useEffect(() => {
         setIsClient(true);
     }, []);
 
-    const allContent = (
-        <>
-            {resumeData.sections.map(sectionId => {
-                const sectionData = resumeData[sectionId as keyof ResumeData];
-                const settingsKey = `show${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}` as keyof typeof resumeData.settings;
-                
-                let isVisible = true;
-                if (sectionId !== 'profile') {
-                    isVisible = !!resumeData.settings[settingsKey];
+    React.useEffect(() => {
+        if (!isClient || !contentRef.current) return;
+
+        const allVisibleSections = resumeData.sections.filter(sectionId => {
+            const sectionData = resumeData[sectionId as keyof ResumeData];
+            const settingsKey = `show${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}` as keyof typeof resumeData.settings;
+            let isVisible = sectionId === 'profile' || !!resumeData.settings[settingsKey];
+            if (!isVisible) return false;
+            if (Array.isArray(sectionData) && sectionData.length === 0) return false;
+            if (typeof sectionData === 'string' && !sectionData.trim()) return false;
+            if (sectionId === 'customSections' && resumeData.customSections.every(s => !s.content.trim())) return false;
+            return true;
+        });
+
+        const newPages: React.ReactNode[] = [];
+        let currentPageSections: ResumeSection[] = [];
+        let currentPageHeight = 0;
+
+        const tempRenderDiv = document.createElement('div');
+        tempRenderDiv.style.width = '210mm';
+        tempRenderDiv.style.position = 'absolute';
+        tempRenderDiv.style.visibility = 'hidden';
+        document.body.appendChild(tempRenderDiv);
+
+        allVisibleSections.forEach(sectionId => {
+            const sectionNode = contentRef.current?.querySelector(`[data-section-id="${sectionId}"]`);
+            if (sectionNode) {
+                const sectionHeight = sectionNode.scrollHeight;
+                if (currentPageHeight + sectionHeight > MAX_CONTENT_HEIGHT && currentPageSections.length > 0) {
+                    newPages.push(currentPageSections);
+                    currentPageSections = [sectionId];
+                    currentPageHeight = sectionHeight;
+                } else {
+                    currentPageSections.push(sectionId);
+                    currentPageHeight += sectionHeight;
                 }
+            }
+        });
+        
+        if (currentPageSections.length > 0) {
+            newPages.push(currentPageSections);
+        }
 
-                if (!isVisible) return null;
+        document.body.removeChild(tempRenderDiv);
 
-                if (Array.isArray(sectionData) && sectionData.length === 0) return null;
-                if (typeof sectionData === 'string' && !sectionData) return null;
-                if (sectionId === 'customSections' && resumeData.customSections.every(s => !s.content)) return null;
+        setPages(newPages.map((pageSections, i) => (
+             <div key={i} className="a4-page-container">
+                <div className="a4-page">
+                    <div className="a4-content">
+                        {(pageSections as ResumeSection[]).map(sectionId => (
+                            <SectionRenderer key={sectionId} sectionId={sectionId} allSections={resumeData.sections} />
+                        ))}
+                    </div>
+                </div>
+            </div>
+        )));
 
-                return <SectionRenderer key={sectionId} sectionId={sectionId} />;
-            })}
-        </>
+    }, [resumeData, isClient, MAX_CONTENT_HEIGHT]);
+
+
+    const allContent = (
+         <div ref={contentRef}>
+            {resumeData.sections.map(sectionId => (
+                <SectionRenderer key={sectionId} sectionId={sectionId} allSections={resumeData.sections}/>
+            ))}
+        </div>
     );
+    
 
     if (!isClient) {
         return (
-             <div className="page-container">
+             <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-100">
                 <div className="a4-page">
                     <div className="a4-content" />
                 </div>
@@ -174,12 +251,24 @@ export function ResumePreviewClassic() {
     }
 
     return (
-        <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-100">
-            <div className="a4-page">
-                <div className="a4-content">
-                    {allContent}
+        <>
+            <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-[0.6] md:scale-100">
+                {pages.length > 0 ? pages : (
+                     <div className="a4-page">
+                        <div className="a4-content">
+                            {allContent}
+                        </div>
+                    </div>
+                )}
+            </div>
+            {/* Hidden content for accurate height measurement */}
+            <div className="absolute top-[-9999px] left-[-9999px] opacity-0" aria-hidden="true">
+                 <div className="a4-page">
+                    <div className="a4-content">
+                        {allContent}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }

@@ -70,8 +70,14 @@
 }
 
 @layer components {
+  .a4-page-container {
+    width: 210mm;
+    height: 297mm;
+    page-break-after: always;
+    overflow: hidden;
+  }
   .a4-page {
-    @apply bg-white shadow-2xl overflow-hidden;
+    @apply bg-white shadow-2xl;
     width: 210mm;
     min-height: 297mm;
     padding: 16mm;
@@ -95,6 +101,8 @@
     html, body {
       background: #fff !important;
       -webkit-print-color-adjust: exact;
+      width: 210mm;
+      height: 297mm;
     }
     .no-print {
       display: none !important;
@@ -112,6 +120,7 @@
     }
     #print-content {
       display: block !important;
+      transform: scale(1) !important;
     }
     .page-container {
       transform: scale(1) !important;
@@ -123,15 +132,17 @@
       box-shadow: none !important;
       border: none !important;
       width: 100%;
-      height: 297mm;
+      height: 100%;
       min-height: 297mm;
       padding: 16mm;
       box-sizing: border-box;
-      page-break-after: always;
       margin: 0;
     }
-    .break-inside-avoid {
+     .break-inside-avoid {
       break-inside: avoid;
+    }
+    .a4-page-container {
+      page-break-after: always;
     }
   }
 }
