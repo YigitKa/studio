@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from "react";
-import type { ResumeData, Language, Template, CreativeColor } from "@/lib/types";
+import type { ResumeData, Language, Template } from "@/lib/types";
 import { initialDataEn, initialDataTr } from "@/lib/initial-data";
 import { getTranslator } from "@/lib/translations";
 
@@ -12,8 +12,6 @@ interface ResumeContextType {
   setLanguage: (lang: Language) => void;
   template: Template;
   setTemplate: React.Dispatch<React.SetStateAction<Template>>;
-  creativeColor: CreativeColor;
-  setCreativeColor: React.Dispatch<React.SetStateAction<CreativeColor>>;
   t: (key: any) => string;
   resetResume: () => void;
 }
@@ -23,7 +21,6 @@ const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<Language>("en");
   const [template, setTemplate] = useState<Template>("modern");
-  const [creativeColor, setCreativeColor] = useState<CreativeColor>("green");
   const [resumeData, setResumeData] = useState<ResumeData>(initialDataEn);
 
   const setLanguage = (lang: Language) => {
@@ -38,7 +35,7 @@ export const ResumeProvider = ({ children }: { children: ReactNode }) => {
   const t = getTranslator(language);
 
   return (
-    <ResumeContext.Provider value={{ resumeData, setResumeData, language, setLanguage, template, setTemplate, creativeColor, setCreativeColor, t, resetResume }}>
+    <ResumeContext.Provider value={{ resumeData, setResumeData, language, setLanguage, template, setTemplate, t, resetResume }}>
       {children}
     </ResumeContext.Provider>
   );
