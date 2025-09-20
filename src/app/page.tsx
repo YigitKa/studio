@@ -8,10 +8,29 @@ import ResumePreview from "@/components/resume-preview";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useResume } from "@/contexts/resume-context";
+import { Button } from "@/components/ui/button";
+import { ZoomIn, ZoomOut } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("editor");
-  const { t } = useResume();
+  const isMobile = useIsMobile();
+  const [zoom, setZoom] = useState(isMobile ? 0.5 : 0.7);
+
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 1.5));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.2));
+
+  const zoomControls = (
+    <div className="flex items-center gap-2 bg-background p-2 rounded-lg border shadow-sm sticky top-[80px] md:top-[80px] z-10 no-print">
+      <Button variant="outline" size="icon" onClick={handleZoomOut}>
+        <ZoomOut className="h-4 w-4" />
+      </Button>
+      <span className="text-sm font-medium w-12 text-center">{Math.round(zoom * 100)}%</span>
+      <Button variant="outline" size="icon" onClick={handleZoomIn}>
+        <ZoomIn className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex flex-col bg-muted/30">
@@ -30,8 +49,9 @@ export default function Home() {
               </div>
             </TabsContent>
             <TabsContent value="preview">
-              <div className="flex items-start justify-center mt-4">
-                <ResumePreview />
+               <div className="flex flex-col items-center gap-4 mt-4">
+                {zoomControls}
+                <ResumePreview zoom={zoom} />
               </div>
             </TabsContent>
           </Tabs>
@@ -41,8 +61,9 @@ export default function Home() {
         <div className={cn("hidden md:block no-print font-poppins")}>
           <ResumeEditor />
         </div>
-        <div className="hidden md:flex items-start justify-center">
-          <ResumePreview />
+        <div className="hidden md:flex flex-col items-center gap-4">
+          {zoomControls}
+          <ResumePreview zoom={zoom} />
         </div>
       </main>
     </div>

@@ -5,7 +5,7 @@ import * as React from "react";
 import { useResume } from "@/contexts/resume-context";
 import type { ResumeSection } from "@/lib/types";
 
-export function ResumePreviewClassic() {
+export function ResumePreviewClassic({ zoom }: { zoom: number }) {
   const { resumeData, t } = useResume();
   const { profile, summary, experience, education, skills, projects, customSections, settings, sections } = resumeData;
 
@@ -136,9 +136,9 @@ export function ResumePreviewClassic() {
   return (
     <div 
       id="resume-preview" 
-      className="page-preview bg-white text-gray-800 shadow-2xl font-sans md:origin-top"
+      className="page-preview bg-white text-gray-800 shadow-2xl font-sans"
       style={{
-        '--scale-factor': '0.7',
+        '--scale-factor': zoom,
         width: 'calc(210mm * var(--scale-factor))',
         minHeight: 'calc(297mm * var(--scale-factor))',
         transform: 'scale(var(--scale-factor))',
