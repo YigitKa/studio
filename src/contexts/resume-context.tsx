@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import type { ResumeData, Language, Template } from "@/lib/types";
 import { initialDataEn, initialDataTr } from "@/lib/initial-data";
 import { getTranslator } from "@/lib/translations";
@@ -18,10 +18,25 @@ interface ResumeContextType {
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
+const getInitialLanguage = (): Language => {
+  if (typeof window === 'undefined') return 'en';
+  const browserLang = navigator.language.split('-')[0];
+  if (browserLang === 'tr') {
+    return 'tr';
+  }
+  return 'en';
+};
+
 export const ResumeProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<Language>("en");
+  const [language, setLanguageState] = useState<Language>('en');
   const [template, setTemplate] = useState<Template>("modern");
   const [resumeData, setResumeData] = useState<ResumeData>(initialDataEn);
+
+  useEffect(() => {
+    const initialLang = getInitialLanguage();
+    setLanguageState(initialLang);
+    setResumeData(initialLang === 'en' ? initialDataEn : initialDataTr);
+  }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);

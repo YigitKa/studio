@@ -9,11 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Download, Languages, LayoutTemplate, Sparkles } from "lucide-react";
+import { Download, Languages, LayoutTemplate, Moon, Sparkles, Sun } from "lucide-react";
 import type { Language, Template } from "@/lib/types";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function Header() {
   const { language, setLanguage, t, template, setTemplate } = useResume();
+  const { theme, setTheme } = useTheme();
 
   const handlePrint = () => {
     window.print();
@@ -26,6 +28,15 @@ export default function Header() {
         <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
       </div>
       <div className="flex items-center gap-4">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          <span className="sr-only">Toggle theme</span>
+        </Button>
         <div className="flex items-center gap-2">
           <LayoutTemplate className="h-5 w-5 text-muted-foreground" />
           <Select

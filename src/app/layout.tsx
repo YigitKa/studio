@@ -4,6 +4,7 @@ import "./globals.css";
 import { ResumeProvider } from "@/contexts/resume-context";
 import { Toaster } from "@/components/ui/toaster";
 import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/contexts/theme-context";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
@@ -18,12 +19,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={cn("antialiased", inter.variable)}>
-        <ResumeProvider>
-          {children}
-          <Toaster />
-        </ResumeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+        >
+          <ResumeProvider>
+            {children}
+            <Toaster />
+          </ResumeProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
