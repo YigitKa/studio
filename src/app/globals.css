@@ -67,7 +67,7 @@
     @apply bg-background text-foreground;
   }
   .page-preview {
-    @apply w-[210mm] h-[297mm] origin-top;
+    @apply w-[210mm] min-h-[297mm] origin-top;
   }
   .a4-content-container {
     @apply w-[210mm] h-[297mm] p-[16mm] box-border text-[10pt] bg-white;
@@ -75,7 +75,7 @@
 
   @media (max-width: 768px) {
     .page-preview {
-      @apply scale-[0.4] origin-top;
+      @apply scale-[0.4] origin-top -translate-y-[88mm];
     }
   }
 }
@@ -97,12 +97,13 @@
       box-shadow: none !important;
       transform: scale(1) !important;
       width: 100% !important;
-      height: 100% !important;
-      max-width: none !important;
+      height: auto !important;
+      min-height: 0 !important;
     }
     .a4-content-container {
       page-break-after: always;
       transform: scale(1) !important;
+      box-shadow: none !important;
     }
     .no-print {
       display: none !important;
