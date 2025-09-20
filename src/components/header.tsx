@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Download, Languages, Moon, Sparkles, Sun, MoreVertical } from "lucide-react";
+import { Languages, Moon, Sparkles, Sun, MoreVertical } from "lucide-react";
 import type { Language } from "@/lib/types";
 import { useTheme } from "@/contexts/theme-context";
 import {
@@ -29,10 +29,6 @@ export default function Header() {
   const { language, setLanguage, t } = useResume();
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
-
-  const handlePrint = () => {
-    window.print();
-  };
   
   const desktopMenu = (
     <>
@@ -60,10 +56,6 @@ export default function Header() {
           </SelectContent>
         </Select>
       </div>
-      <Button onClick={handlePrint}>
-        <Download className="mr-2 h-4 w-4" />
-        {t("downloadPdf")}
-      </Button>
     </>
   );
 
@@ -91,10 +83,6 @@ export default function Header() {
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
-        <DropdownMenuItem onClick={handlePrint}>
-          <Download className="mr-2" />
-          <span>{t("downloadPdf")}</span>
-        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
