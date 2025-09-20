@@ -41,6 +41,11 @@ const translations = {
     removeSkill: "Remove",
     enhanceWithAI: "Enhance with AI",
     enhancing: "Enhancing...",
+    customSections: "Custom Sections",
+    addCustomSection: "Add Custom Section",
+    sectionTitle: "Section Title",
+    content: "Content",
+    removeSection: "Remove Section",
   },
   tr: {
     title: "Resumify AI",
@@ -82,6 +87,11 @@ const translations = {
     removeSkill: "Kaldır",
     enhanceWithAI: "AI ile Geliştir",
     enhancing: "Geliştiriliyor...",
+    customSections: "Özel Bölümler",
+    addCustomSection: "Özel Bölüm Ekle",
+    sectionTitle: "Bölüm Başlığı",
+    content: "İçerik",
+    removeSection: "Bölümü Kaldır",
   },
 };
 

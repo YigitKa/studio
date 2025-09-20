@@ -36,6 +36,12 @@ export interface ProjectData {
   description: string;
 }
 
+export interface CustomSectionData {
+  id: string;
+  title: string;
+  content: string;
+}
+
 export interface ResumeData {
   profile: ProfileData;
   summary: string;
@@ -43,4 +49,5 @@ export interface ResumeData {
   education: EducationData[];
   projects: ProjectData[];
   skills: string[];
+  customSections: CustomSectionData[];
 }

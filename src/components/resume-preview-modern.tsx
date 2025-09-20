@@ -1,12 +1,12 @@
 "use client";
 
 import { useResume } from "@/contexts/resume-context";
-import { Phone, Mail, MapPin, Briefcase, GraduationCap, Wrench, User } from 'lucide-react';
+import { Phone, Mail, MapPin, Briefcase, GraduationCap, Wrench, User, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 export function ResumePreviewModern() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, skills } = resumeData;
+  const { profile, summary, experience, education, skills, customSections } = resumeData;
 
   return (
     <div 
@@ -69,6 +69,20 @@ export function ResumePreviewModern() {
               ))}
             </ul>
           </section>
+          
+          {customSections && customSections.length > 0 && (
+            customSections.map(sec => (
+              <section key={sec.id} className="mb-3.5">
+                <h3 className="text-base font-semibold text-[#0b2540] border-l-4 border-[#6b7bd8] pl-1.5 mb-1.5 flex items-center gap-2">
+                  <Star size={16} /> {sec.title}
+                </h3>
+                <ul className="list-disc list-inside text-sm leading-relaxed space-y-1 pl-2">
+                  {sec.content.split('\n').map((line, i) => line && <li key={i} className="text-xs text-[#444]">{line.replace(/^- /, '')}</li>)}
+                </ul>
+              </section>
+            ))
+          )}
+
         </div>
 
         {/* Right Column */}

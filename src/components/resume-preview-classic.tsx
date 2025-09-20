@@ -4,7 +4,7 @@ import { useResume } from "@/contexts/resume-context";
 
 export function ResumePreviewClassic() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, skills, projects } = resumeData;
+  const { profile, summary, experience, education, skills, projects, customSections } = resumeData;
 
   // Function to chunk skills into multiple arrays for columns
   const chunkArray = (arr: string[], size: number) =>
@@ -99,6 +99,17 @@ export function ResumePreviewClassic() {
           ))}
         </div>
       </section>
+      )}
+
+      {customSections && customSections.length > 0 && (
+        customSections.map(sec => (
+          <section key={sec.id} className="mb-6">
+            <h2 className="text-lg font-bold border-b-2 border-black pb-1 mb-2">{sec.title}</h2>
+            <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1 pl-2">
+              {sec.content.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+            </ul>
+          </section>
+        ))
       )}
 
       <section>

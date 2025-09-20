@@ -5,7 +5,7 @@ import { Separator } from "./ui/separator";
 
 export function ResumePreviewMinimalist() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, projects, skills } = resumeData;
+  const { profile, summary, experience, education, projects, skills, customSections } = resumeData;
 
   return (
     <div
@@ -75,6 +75,20 @@ export function ResumePreviewMinimalist() {
               ))}
             </div>
           </section>
+        </>
+      )}
+
+      {customSections && customSections.length > 0 && (
+        <>
+          <Separator className="my-8" />
+          {customSections.map(sec => (
+            <section key={sec.id} className="mb-8">
+              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{sec.title}</h3>
+              <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
+                {sec.content.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+              </ul>
+            </section>
+          ))}
         </>
       )}
 

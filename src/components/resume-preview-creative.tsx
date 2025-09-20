@@ -1,7 +1,7 @@
 "use client";
 
 import { useResume } from "@/contexts/resume-context";
-import { Phone, Mail, MapPin, Briefcase, GraduationCap, Wrench, User, FolderGit2 } from 'lucide-react';
+import { Phone, Mail, MapPin, Briefcase, GraduationCap, Wrench, User, FolderGit2, Star } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const headerBg = 'bg-accent';
@@ -9,7 +9,7 @@ const textColor = 'text-accent';
 
 export function ResumePreviewCreative() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, projects, skills } = resumeData;
+  const { profile, summary, experience, education, projects, skills, customSections } = resumeData;
 
   return (
     <div
@@ -111,6 +111,18 @@ export function ResumePreviewCreative() {
             </div>
           </section>
           )}
+
+          {customSections && customSections.length > 0 && (
+            customSections.map(sec => (
+              <section key={sec.id} className="mt-6">
+                <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Star size={16} /> {sec.title}</h3>
+                <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
+                  {sec.content.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+                </ul>
+              </section>
+            ))
+          )}
+
         </div>
       </div>
     </div>

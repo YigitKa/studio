@@ -106,6 +106,28 @@ export default function ResumeEditor() {
     setResumeData(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== index) }));
   };
 
+  const handleCustomSectionChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setResumeData(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(sec => (sec.id === id ? { ...sec, [name]: value } : sec)),
+    }));
+  };
+
+  const addCustomSection = () => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: [...(prev.customSections || []), { id: `custom${Date.now()}`, title: '', content: '' }],
+    }));
+  };
+
+  const removeCustomSection = (id: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      customSections: prev.customSections.filter(sec => sec.id !== id),
+    }));
+  };
+
   const handleEnhance = (
     content: string,
     updater: (enhancedContent: string) => void
@@ -126,7 +148,7 @@ export default function ResumeEditor() {
 
   return (
     <div className="space-y-6">
-      <Accordion type="multiple" defaultValue={["profile", "summary", "experience", "education", "projects", "skills"]} className="w-full">
+      <Accordion type="multiple" className="w-full">
         <AccordionItem value="profile">
           <AccordionTrigger className="text-lg font-semibold">{t('profile')}</AccordionTrigger>
           <AccordionContent className="space-y-4 p-1">
@@ -293,6 +315,32 @@ export default function ResumeEditor() {
               <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
           </AccordionContent>
         </AccordionItem>
+
+        <AccordionItem value="customSections">
+          <AccordionTrigger className="text-lg font-semibold">{t('customSections')}</AccordionTrigger>
+          <AccordionContent className="space-y-6 p-1">
+            {resumeData.customSections && resumeData.customSections.map((sec, index) => (
+              <div key={sec.id} className="p-4 border rounded-lg space-y-4 relative">
+                <div>
+                  <Label htmlFor={`custom-title-${index}`}>{t('sectionTitle')}</Label>
+                  <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`custom-content-${index}`}>{t('content')}</Label>
+                  <Textarea id={`custom-content-${index}`} name="content" value={sec.content} onChange={e => handleCustomSectionChange(sec.id, e)} rows={4} />
+                  <Button variant="outline" size="sm" onClick={() => handleEnhance(sec.content, (content) => handleCustomSectionChange(sec.id, { target: { name: 'content', value: content } } as any))} disabled={isPending}>
+                    <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+                  </Button>
+                </div>
+                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeCustomSection(sec.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button variant="outline" onClick={addCustomSection}><Plus className="mr-2 h-4 w-4" /> {t('addCustomSection')}</Button>
+          </AccordionContent>
+        </AccordionItem>
+
       </Accordion>
     </div>
   );
