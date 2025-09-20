@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useResume } from "@/contexts/resume-context";
@@ -20,6 +21,7 @@ import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } 
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const ProfileEditor = () => {
     const { resumeData, setResumeData, t } = useResume();
@@ -581,7 +583,7 @@ const SortableSection = ({ id, openSections, onToggle, isEditMode }: { id: Resum
   };
   
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className="touch-none">
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={cn(isEditMode && "touch-none")}>
        <SectionEditor id={id} openSections={openSections} onToggle={onToggle} isEditMode={isEditMode}/>
     </div>
   );
