@@ -8,7 +8,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { GripVertical, Plus, Sparkles, Trash2 } from "lucide-react";
 import { PhotoUploader } from "./photo-uploader";
-import { useTransition } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { enhanceSectionAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "./ui/switch";
@@ -52,6 +52,11 @@ export default function ResumeEditor() {
   const { resumeData, setResumeData, t } = useResume();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -223,10 +228,10 @@ export default function ResumeEditor() {
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (active.id !== over?.id) {
+    if (over && active.id !== over.id) {
       setResumeData((prev) => {
         const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
-        const newIndex = prev.sections.indexOf(over!.id as ResumeSection);
+        const newIndex = prev.sections.indexOf(over.id as ResumeSection);
         const newSections = [...prev.sections];
         newSections.splice(oldIndex, 1);
         newSections.splice(newIndex, 0, active.id as ResumeSection);
@@ -291,13 +296,13 @@ export default function ResumeEditor() {
            <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.experience.map((exp, index) => (
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
-                <div className="flex items-center justify-between p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
-                        <span className="truncate pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
-                    </AccordionTrigger>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                <div className="flex items-center p-4">
+                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
+                      <span className="truncate pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                  </AccordionTrigger>
+                  <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
                 <AccordionContent className="space-y-4 p-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,13 +356,13 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.education.map((edu, index) => (
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
-                <div className="flex items-center justify-between p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
-                        <span className="truncate pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
-                    </AccordionTrigger>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                <div className="flex items-center p-4">
+                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
+                      <span className="truncate pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                  </AccordionTrigger>
+                  <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
                 <AccordionContent className="space-y-4 p-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -404,8 +409,8 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.projects.map((proj, index) => (
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
-                 <div className="flex items-center justify-between p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                 <div className="flex items-center p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
                         <span className="truncate pr-4">{proj.name || t('projectName')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
@@ -477,8 +482,8 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
              {resumeData.customSections && resumeData.customSections.map((sec, index) => (
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
-                 <div className="flex items-center justify-between p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                 <div className="flex items-center p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
                         <span className="truncate pr-4">{sec.title || t('sectionTitle')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
@@ -506,6 +511,16 @@ export default function ResumeEditor() {
       </SortableCard>
     ),
   };
+
+  if (!isClient) {
+    return (
+      <div className="space-y-6">
+        {resumeData.sections.map((sectionId) => (
+          <div key={sectionId}>{sectionComponents[sectionId]}</div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <DndContext
