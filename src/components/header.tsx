@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Download, Languages, LayoutTemplate, Sparkles } from "lucide-react";
-import type { Language, Template } from "@/lib/types";
+import { Download, Languages, LayoutTemplate, Sparkles, Palette } from "lucide-react";
+import type { Language, Template, CreativeColor } from "@/lib/types";
 
 export default function Header() {
-  const { language, setLanguage, t, template, setTemplate } = useResume();
+  const { language, setLanguage, t, template, setTemplate, creativeColor, setCreativeColor } = useResume();
 
   const handlePrint = () => {
     window.print();
@@ -43,6 +43,28 @@ export default function Header() {
             </SelectContent>
           </Select>
         </div>
+        {template === 'creative' && (
+           <div className="flex items-center gap-2">
+              <Palette className="h-5 w-5 text-muted-foreground" />
+              <Select
+                value={creativeColor}
+                onValueChange={(value) => setCreativeColor(value as CreativeColor)}
+              >
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Color" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="green">Green</SelectItem>
+                  <SelectItem value="red">Red</SelectItem>
+                  <SelectItem value="orange">Orange</SelectItem>
+                  <SelectItem value="blue">Blue</SelectItem>
+                  <SelectItem value="purple">Purple</SelectItem>
+                  <SelectItem value="gray">Gray</SelectItem>
+                  <SelectItem value="black">Black</SelectItem>
+                </SelectContent>
+              </Select>
+           </div>
+        )}
         <div className="flex items-center gap-2">
           <Languages className="h-5 w-5 text-muted-foreground" />
           <Select

@@ -1,5 +1,6 @@
 export type Language = 'en' | 'tr';
 export type Template = 'modern' | 'classic' | 'creative' | 'minimalist';
+export type CreativeColor = 'green' | 'red' | 'orange' | 'blue' | 'purple' | 'gray' | 'black';
 
 export interface ProfileData {
   name: string;
