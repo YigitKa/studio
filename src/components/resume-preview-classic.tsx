@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useResume } from "@/contexts/resume-context";
 import type { ResumeSection } from "@/lib/types";
 

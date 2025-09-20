@@ -1,5 +1,5 @@
 export type Language = 'en' | 'tr';
-export type Template = 'modern' | 'classic' | 'creative' | 'minimalist';
+export type Template = 'classic';
 
 export interface ProfileData {
   name: string;

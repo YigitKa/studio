@@ -9,12 +9,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Download, Languages, LayoutTemplate, Moon, Sparkles, Sun } from "lucide-react";
-import type { Language, Template } from "@/lib/types";
+import { Download, Languages, Moon, Sparkles, Sun } from "lucide-react";
+import type { Language } from "@/lib/types";
 import { useTheme } from "@/contexts/theme-context";
 
 export default function Header() {
-  const { language, setLanguage, t, template, setTemplate } = useResume();
+  const { language, setLanguage, t } = useResume();
   const { theme, setTheme } = useTheme();
 
   const handlePrint = () => {
@@ -37,23 +37,6 @@ export default function Header() {
           <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
           <span className="sr-only">Toggle theme</span>
         </Button>
-        <div className="flex items-center gap-2">
-          <LayoutTemplate className="h-5 w-5 text-muted-foreground" />
-          <Select
-            value={template}
-            onValueChange={(value) => setTemplate(value as Template)}
-          >
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Template" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="modern">Modern</SelectItem>
-              <SelectItem value="classic">Classic</SelectItem>
-              <SelectItem value="creative">Creative</SelectItem>
-              <SelectItem value="minimalist">Minimalist</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
         <div className="flex items-center gap-2">
           <Languages className="h-5 w-5 text-muted-foreground" />
           <Select
