@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Languages, Moon, Sparkles, Sun, MoreVertical, Download } from "lucide-react";
+import { Languages, Moon, Sparkles, Sun, MoreVertical } from "lucide-react";
 import type { Language } from "@/lib/types";
 import { useTheme } from "@/contexts/theme-context";
 import {
@@ -29,20 +29,9 @@ export default function Header() {
   const { language, setLanguage, t } = useResume();
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
-
-  const handlePrint = () => {
-    window.print();
-  };
   
   const desktopMenu = (
     <>
-      <Button 
-        variant="outline"
-        onClick={handlePrint}
-      >
-        <Download className="mr-2 h-4 w-4" />
-        {t("downloadPdf")}
-      </Button>
       <Button 
         variant="outline" 
         size="icon" 
@@ -78,10 +67,6 @@ export default function Header() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={handlePrint}>
-            <Download className="mr-2"/>
-            <span>{t('downloadPdf')}</span>
-        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
           {theme === 'dark' ? <Sun className="mr-2"/> : <Moon className="mr-2"/>}
           <span>Toggle Theme</span>
@@ -103,7 +88,7 @@ export default function Header() {
   );
 
   return (
-    <header className="flex items-center justify-between p-4 border-b bg-background no-print sticky top-0 z-10">
+    <header className="flex items-center justify-between p-4 border-b bg-background sticky top-0 z-10">
       <div className="flex items-center gap-2">
         <Sparkles className="h-6 w-6 text-accent" />
         <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>

@@ -89,38 +89,3 @@
       break-inside: avoid;
   }
 }
-
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .print-only, .print-only * {
-    visibility: visible;
-  }
-
-  .print-only {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-  
-  .a4-page-container {
-    overflow: visible;
-  }
-
-  .a4-page {
-    @apply shadow-none;
-    margin: 0;
-    width: 210mm;
-    height: 297mm;
-    page-break-after: always;
-    box-sizing: border-box;
-  }
-}

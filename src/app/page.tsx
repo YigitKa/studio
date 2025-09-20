@@ -14,18 +14,13 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-muted/30">
       <Header />
       <main className="flex-1 md:grid md:grid-cols-2 gap-8 p-4 md:p-8">
-        <div className={cn("no-print font-poppins", isMobile ? "mt-4" : "")}>
+        <div className={cn("font-poppins", isMobile ? "mt-4" : "")}>
           <ResumeEditor />
         </div>
         <div className={cn("flex-col items-center gap-4", isMobile ? "hidden" : "flex")}>
            <ResumePreview />
         </div>
       </main>
-      
-      {/* Hidden container for printing */}
-      <div className="hidden print-only">
-        <ResumePreview />
-      </div>
     </div>
   );
 }
