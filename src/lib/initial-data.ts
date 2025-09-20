@@ -1,5 +1,15 @@
 import type { ResumeData } from './types';
 
+const defaultSettings = {
+  showProfile: true,
+  showSummary: true,
+  showExperience: true,
+  showEducation: true,
+  showProjects: true,
+  showSkills: true,
+  showCustomSections: true,
+};
+
 export const initialDataEn: ResumeData = {
   profile: {
     name: 'Jane Doe',
@@ -59,6 +69,7 @@ export const initialDataEn: ResumeData = {
   ],
   skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes', 'WebAssembly', 'Version Control with Git', 'Donor Engagement'],
   customSections: [],
+  settings: defaultSettings,
 };
 
 export const initialDataTr: ResumeData = {
@@ -120,4 +131,5 @@ export const initialDataTr: ResumeData = {
   ],
   skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes', 'WebAssembly', 'Git ile Sürüm Kontrolü', 'Bağışçı Etkileşimi'],
   customSections: [],
+  settings: defaultSettings,
 };

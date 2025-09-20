@@ -6,11 +6,13 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { Plus, Sparkles, Trash2 } from "lucide-react";
+import { Plus, Sparkles, Trash2, Eye, EyeOff } from "lucide-react";
 import { PhotoUploader } from "./photo-uploader";
 import { useTransition } from "react";
 import { enhanceSectionAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { Switch } from "./ui/switch";
+import type { ResumeSettings } from "@/lib/types";
 
 export default function ResumeEditor() {
   const { resumeData, setResumeData, t } = useResume();
@@ -162,11 +164,36 @@ export default function ResumeEditor() {
     });
   };
 
+  const handleToggleSection = (section: keyof ResumeSettings) => {
+    setResumeData(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        [section]: !prev.settings[section],
+      },
+    }));
+  };
+  
+  const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
+    <div className="flex items-center justify-between w-full">
+      <span>{title}</span>
+      <div className="flex items-center gap-2">
+        <Switch
+          checked={resumeData.settings[sectionKey]}
+          onCheckedChange={() => handleToggleSection(sectionKey)}
+          aria-label={`Toggle ${title} section`}
+        />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <Accordion type="multiple" className="w-full">
         <AccordionItem value="profile">
-          <AccordionTrigger className="text-lg font-semibold">{t('profile')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('profile')} sectionKey="showProfile" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-4 p-1">
             <PhotoUploader />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -195,7 +222,9 @@ export default function ResumeEditor() {
         </AccordionItem>
 
         <AccordionItem value="summary">
-          <AccordionTrigger className="text-lg font-semibold">{t('summary')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('summary')} sectionKey="showSummary" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-2 p-1">
             <Label htmlFor="summary-text">{t('summary')}</Label>
             <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} />
@@ -206,7 +235,9 @@ export default function ResumeEditor() {
         </AccordionItem>
 
         <AccordionItem value="experience">
-          <AccordionTrigger className="text-lg font-semibold">{t('experience')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+             <SectionHeader title={t('experience')} sectionKey="showExperience" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-6 p-1">
             {resumeData.experience.map((exp, index) => (
               <div key={exp.id} className="p-4 border rounded-lg space-y-4 relative">
@@ -254,7 +285,9 @@ export default function ResumeEditor() {
         </AccordionItem>
 
         <AccordionItem value="education">
-          <AccordionTrigger className="text-lg font-semibold">{t('education')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('education')} sectionKey="showEducation" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-6 p-1">
             {resumeData.education.map((edu, index) => (
               <div key={edu.id} className="p-4 border rounded-lg space-y-4 relative">
@@ -295,7 +328,9 @@ export default function ResumeEditor() {
         </AccordionItem>
 
         <AccordionItem value="projects">
-          <AccordionTrigger className="text-lg font-semibold">{t('projects')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('projects')} sectionKey="showProjects" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-6 p-1">
             {resumeData.projects.map((proj, index) => (
               <div key={proj.id} className="p-4 border rounded-lg space-y-4 relative">
@@ -331,7 +366,9 @@ export default function ResumeEditor() {
         </AccordionItem>
         
         <AccordionItem value="skills">
-          <AccordionTrigger className="text-lg font-semibold">{t('skills')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('skills')} sectionKey="showSkills" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-4 p-1">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {resumeData.skills.map((skill, index) => (
@@ -353,7 +390,9 @@ export default function ResumeEditor() {
         </AccordionItem>
 
         <AccordionItem value="customSections">
-          <AccordionTrigger className="text-lg font-semibold">{t('customSections')}</AccordionTrigger>
+          <AccordionTrigger className="text-lg font-semibold w-full">
+            <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
+          </AccordionTrigger>
           <AccordionContent className="space-y-6 p-1">
             {resumeData.customSections && resumeData.customSections.map((sec, index) => (
               <div key={sec.id} className="p-4 border rounded-lg space-y-4 relative">

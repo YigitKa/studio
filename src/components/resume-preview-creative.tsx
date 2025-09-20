@@ -9,7 +9,7 @@ const textColor = 'text-accent';
 
 export function ResumePreviewCreative() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, projects, skills, customSections } = resumeData;
+  const { profile, summary, experience, education, projects, skills, customSections, settings } = resumeData;
 
   return (
     <div
@@ -23,77 +23,89 @@ export function ResumePreviewCreative() {
         fontSize: '10pt',
       }}
     >
-      <header className={`flex items-center justify-between mb-6 p-6 rounded-lg -mx-2 ${headerBg} text-accent-foreground`}>
-        <div className="w-3/4">
-          <h1 className="text-4xl font-bold tracking-tight">{profile.name}</h1>
-          <h2 className="text-lg text-accent-foreground/80 mt-1">{profile.title}</h2>
-        </div>
-        <div className="w-1/4 flex justify-end">
-            <Avatar className="w-24 h-24 border-4 border-white">
-                <AvatarImage src={profile.photoUrl} alt={profile.name} data-ai-hint="person face" />
-                <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
-            </Avatar>
-        </div>
-      </header>
+      {settings.showProfile && (
+        <header className={`flex items-center justify-between mb-6 p-6 rounded-lg -mx-2 ${headerBg} text-accent-foreground`}>
+          <div className="w-3/4">
+            <h1 className="text-4xl font-bold tracking-tight">{profile.name}</h1>
+            <h2 className="text-lg text-accent-foreground/80 mt-1">{profile.title}</h2>
+          </div>
+          <div className="w-1/4 flex justify-end">
+              <Avatar className="w-24 h-24 border-4 border-white">
+                  <AvatarImage src={profile.photoUrl} alt={profile.name} data-ai-hint="person face" />
+                  <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+              </Avatar>
+          </div>
+        </header>
+      )}
 
       <div className="grid grid-cols-12 gap-8">
         <div className="col-span-4 space-y-6">
-          <section>
-            <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><User size={16} /> Contact</h3>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p className="flex items-center gap-2"><Mail size={14} />{profile.email}</p>
-              <p className="flex items-center gap-2"><Phone size={14} />{profile.phone}</p>
-              <p className="flex items-center gap-2"><MapPin size={14} />{profile.address}</p>
-            </div>
-          </section>
+          {settings.showProfile && (
+            <section>
+              <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><User size={16} /> Contact</h3>
+              <div className="space-y-1 text-sm text-gray-600">
+                <p className="flex items-center gap-2"><Mail size={14} />{profile.email}</p>
+                <p className="flex items-center gap-2"><Phone size={14} />{profile.phone}</p>
+                <p className="flex items-center gap-2"><MapPin size={14} />{profile.address}</p>
+              </div>
+            </section>
+          )}
 
-          <section>
-            <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Wrench size={16} /> {t('skills')}</h3>
-            <ul className="list-disc list-inside text-sm space-y-1">
-              {skills.map((skill, index) => (
-                <li key={index}>{skill}</li>
-              ))}
-            </ul>
-          </section>
+          {settings.showSkills && skills.length > 0 && (
+            <section>
+              <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Wrench size={16} /> {t('skills')}</h3>
+              <ul className="list-disc list-inside text-sm space-y-1">
+                {skills.map((skill, index) => (
+                  <li key={index}>{skill}</li>
+                ))}
+              </ul>
+            </section>
+          )}
 
-          <section>
-            <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><GraduationCap size={16} /> {t('education')}</h3>
-            <div className="space-y-4">
-              {education.map(edu => (
-                <div key={edu.id} className="text-sm">
-                  <h4 className="font-semibold">{edu.institution}</h4>
-                  <p className="text-gray-600">{edu.degree}</p>
-                  <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
-                </div>
-              ))}
-            </div>
-          </section>
+          {settings.showEducation && education.length > 0 && (
+            <section>
+              <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><GraduationCap size={16} /> {t('education')}</h3>
+              <div className="space-y-4">
+                {education.map(edu => (
+                  <div key={edu.id} className="text-sm">
+                    <h4 className="font-semibold">{edu.institution}</h4>
+                    <p className="text-gray-600">{edu.degree}</p>
+                    <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         <div className="col-span-8">
-          <section className="mb-6">
-            <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><User size={16} /> {t('summary')}</h3>
-            <p className="text-sm leading-relaxed">{summary}</p>
-          </section>
+          {settings.showSummary && summary && (
+            <section className="mb-6">
+              <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><User size={16} /> {t('summary')}</h3>
+              <p className="text-sm leading-relaxed">{summary}</p>
+            </section>
+          )}
 
-          <section className="mb-6">
-            <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Briefcase size={16} /> {t('experience')}</h3>
-            <div className="space-y-6">
-              {experience.map(exp => (
-                <div key={exp.id} className="relative pl-6">
-                    <div className="absolute left-0 h-full w-0.5 bg-gray-200"></div>
-                    <div className={`absolute left-[-5px] top-1 h-3 w-3 rounded-full ${headerBg}`}></div>
-                    <h4 className="font-semibold text-md">{exp.title}</h4>
-                    <p className="text-gray-600 text-sm">{exp.company} | {exp.startDate} - {exp.endDate}</p>
-                    <ul className="mt-2 list-disc list-inside text-sm leading-relaxed space-y-1">
-                        {exp.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
-                    </ul>
-                </div>
-              ))}
-            </div>
-          </section>
+          {settings.showExperience && experience.length > 0 && (
+            <section className="mb-6">
+              <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Briefcase size={16} /> {t('experience')}</h3>
+              <div className="space-y-6">
+                {experience.map(exp => (
+                  <div key={exp.id} className="relative pl-6">
+                      <div className="absolute left-0 h-full w-0.5 bg-gray-200"></div>
+                      <div className={`absolute left-[-5px] top-1 h-3 w-3 rounded-full ${headerBg}`}></div>
+                      <h4 className="font-semibold text-md">{exp.title}</h4>
+                      <p className="text-gray-600 text-sm">{exp.company} | {exp.startDate} - {exp.endDate}</p>
+                      <ul className="mt-2 list-disc list-inside text-sm leading-relaxed space-y-1">
+                          {exp.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+                      </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
-          {projects && projects.length > 0 && (
+          {settings.showProjects && projects && projects.length > 0 && (
           <section>
             <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><FolderGit2 size={16} /> {t('projects')}</h3>
             <div className="space-y-4">
@@ -112,7 +124,7 @@ export function ResumePreviewCreative() {
           </section>
           )}
 
-          {customSections && customSections.length > 0 && (
+          {settings.showCustomSections && customSections && customSections.length > 0 && (
             customSections.map(sec => (
               <section key={sec.id} className="mt-6">
                 <h3 className={`uppercase font-bold tracking-widest text-sm ${textColor} mb-3 flex items-center gap-2`}><Star size={16} /> {sec.title}</h3>
