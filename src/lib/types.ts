@@ -1,4 +1,5 @@
 export type Language = 'en' | 'tr';
+export type Template = 'modern' | 'classic';
 
 export interface ProfileData {
   name: string;
@@ -28,10 +29,18 @@ export interface EducationData {
   endDate: string;
 }
 
+export interface ProjectData {
+  id: string;
+  name: string;
+  date: string;
+  description: string;
+}
+
 export interface ResumeData {
   profile: ProfileData;
   summary: string;
   experience: ExperienceData[];
   education: EducationData[];
+  projects: ProjectData[];
   skills: string[];
 }

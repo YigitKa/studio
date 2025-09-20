@@ -49,7 +49,15 @@ export const initialDataEn: ResumeData = {
       endDate: '2014',
     },
   ],
-  skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes'],
+  projects: [
+    {
+      id: 'proj1',
+      name: 'Full-Stack Website Development Project',
+      date: 'May 2024',
+      description: `- Engineered a full-stack website, integrating front-end and back-end components, with the codebase shared on GitHub for collaborative development.\n- Applied expertise in C# and WebAssembly (Wasm) rendering to create a high-performance game engine, enhancing user interaction and experience.`
+    }
+  ],
+  skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes', 'WebAssembly', 'Version Control with Git', 'Donor Engagement'],
 };
 
 export const initialDataTr: ResumeData = {
@@ -101,5 +109,13 @@ export const initialDataTr: ResumeData = {
       endDate: '2014',
     },
   ],
-  skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes'],
+  projects: [
+    {
+      id: 'proj1',
+      name: 'Full-Stack Web Sitesi Geliştirme Projesi',
+      date: 'Mayıs 2024',
+      description: `- İşbirliğine dayalı geliştirme için kod tabanının GitHub\'da paylaşıldığı, ön uç ve arka uç bileşenlerini entegre eden tam yığın bir web sitesi tasarladı.\n- Kullanıcı etkileşimini ve deneyimini geliştiren yüksek performanslı bir oyun motoru oluşturmak için C# ve WebAssembly (Wasm) oluşturma konusundaki uzmanlığını uyguladı.`
+    }
+  ],
+  skills: ['JavaScript', 'TypeScript', 'React', 'Node.js', 'Next.js', 'GraphQL', 'AWS', 'Docker', 'Kubernetes', 'WebAssembly', 'Git ile Sürüm Kontrolü', 'Bağışçı Etkileşimi'],
 };

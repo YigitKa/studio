@@ -9,11 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Download, Languages, Sparkles } from "lucide-react";
-import type { Language } from "@/lib/types";
+import { Download, Languages, LayoutTemplate, Sparkles } from "lucide-react";
+import type { Language, Template } from "@/lib/types";
 
 export default function Header() {
-  const { language, setLanguage, t } = useResume();
+  const { language, setLanguage, t, template, setTemplate } = useResume();
 
   const handlePrint = () => {
     window.print();
@@ -26,6 +26,21 @@ export default function Header() {
         <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
       </div>
       <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <LayoutTemplate className="h-5 w-5 text-muted-foreground" />
+          <Select
+            value={template}
+            onValueChange={(value) => setTemplate(value as Template)}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Template" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="modern">Modern</SelectItem>
+              <SelectItem value="classic">Classic</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         <div className="flex items-center gap-2">
           <Languages className="h-5 w-5 text-muted-foreground" />
           <Select

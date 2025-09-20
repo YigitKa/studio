@@ -70,6 +70,28 @@ export default function ResumeEditor() {
     }));
   };
 
+  const handleProjectChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setResumeData(prev => ({
+      ...prev,
+      projects: prev.projects.map(proj => (proj.id === id ? { ...proj, [name]: value } : proj)),
+    }));
+  };
+
+  const addProject = () => {
+    setResumeData(prev => ({
+      ...prev,
+      projects: [...prev.projects, { id: `proj${Date.now()}`, name: '', date: '', description: '' }],
+    }));
+  };
+
+  const removeProject = (id: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      projects: prev.projects.filter(proj => proj.id !== id),
+    }));
+  };
+
   const handleSkillChange = (index: number, value: string) => {
     const newSkills = [...resumeData.skills];
     newSkills[index] = value;
@@ -104,7 +126,7 @@ export default function ResumeEditor() {
 
   return (
     <div className="space-y-6">
-      <Accordion type="multiple" defaultValue={["profile", "summary", "experience", "education", "skills"]} className="w-full">
+      <Accordion type="multiple" defaultValue={["profile", "summary", "experience", "education", "projects", "skills"]} className="w-full">
         <AccordionItem value="profile">
           <AccordionTrigger className="text-lg font-semibold">{t('profile')}</AccordionTrigger>
           <AccordionContent className="space-y-4 p-1">
@@ -221,6 +243,37 @@ export default function ResumeEditor() {
               </div>
             ))}
             <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="projects">
+          <AccordionTrigger className="text-lg font-semibold">{t('projects')}</AccordionTrigger>
+          <AccordionContent className="space-y-6 p-1">
+            {resumeData.projects.map((proj, index) => (
+              <div key={proj.id} className="p-4 border rounded-lg space-y-4 relative">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor={`proj-name-${index}`}>{t('projectName')}</Label>
+                    <Input id={`proj-name-${index}`} name="name" value={proj.name} onChange={e => handleProjectChange(proj.id, e)} />
+                  </div>
+                  <div>
+                    <Label htmlFor={`proj-date-${index}`}>{t('projectDate')}</Label>
+                    <Input id={`proj-date-${index}`} name="date" value={proj.date} onChange={e => handleProjectChange(proj.id, e)} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`proj-desc-${index}`}>{t('description')}</Label>
+                  <Textarea id={`proj-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={proj.description} onChange={e => handleProjectChange(proj.id, e)} rows={4} />
+                   <Button variant="outline" size="sm" onClick={() => handleEnhance(proj.description, (content) => handleProjectChange(proj.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
+                      <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+                   </Button>
+                </div>
+                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeProject(proj.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+            <Button variant="outline" onClick={addProject}><Plus className="mr-2 h-4 w-4" /> {t('addProject')}</Button>
           </AccordionContent>
         </AccordionItem>
         
