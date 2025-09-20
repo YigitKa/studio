@@ -2,10 +2,128 @@
 
 import { useResume } from "@/contexts/resume-context";
 import { Separator } from "./ui/separator";
+import type { ResumeSection } from "@/lib/types";
+import React from "react";
 
 export function ResumePreviewMinimalist() {
   const { resumeData, t } = useResume();
-  const { profile, summary, experience, education, projects, skills, customSections, settings } = resumeData;
+  const { profile, summary, experience, education, projects, skills, customSections, settings, sections } = resumeData;
+
+  const sectionComponents: Record<ResumeSection, React.ReactNode> = {
+    profile: settings.showProfile && (
+      <header className="text-center mb-8">
+        <h1 className="text-5xl font-extrabold tracking-tighter">{profile.name}</h1>
+        <h2 className="text-xl text-gray-500 mt-2 font-light tracking-wide">{profile.title}</h2>
+        <div className="flex justify-center items-center gap-x-6 text-xs mt-4 text-gray-500">
+          <span>{profile.phone}</span>
+          <span>{profile.email}</span>
+          <span>{profile.address}</span>
+        </div>
+      </header>
+    ),
+    summary: settings.showSummary && summary && (
+      <section className="mb-8">
+        <p className="text-center text-sm leading-relaxed max-w-3xl mx-auto">{summary}</p>
+      </section>
+    ),
+    experience: settings.showExperience && experience.length > 0 && (
+      <section className="mb-8">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('experience')}</h3>
+        <div className="space-y-6">
+          {experience.map(exp => (
+            <div key={exp.id} className="grid grid-cols-4 gap-4">
+              <div className="col-span-1 text-xs text-gray-500">
+                <p>{exp.startDate} - {exp.endDate}</p>
+                <p>{exp.location}</p>
+              </div>
+              <div className="col-span-3">
+                <h4 className="font-semibold">{exp.title}</h4>
+                <p className="text-sm text-gray-600">{exp.company}</p>
+                <ul className="mt-2 list-disc list-inside text-sm leading-relaxed space-y-1">
+                  {exp.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+                </ul>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+    projects: settings.showProjects && projects && projects.length > 0 && (
+      <section className="mb-8">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('projects')}</h3>
+        <div className="space-y-5">
+          {projects.map(proj => (
+            <div key={proj.id}>
+                <div className="flex justify-between items-baseline">
+                    <h4 className="font-semibold">{proj.name}</h4>
+                    <div className="text-xs text-gray-500">{proj.date}</div>
+                </div>
+              <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
+                {proj.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+    customSections: settings.showCustomSections && customSections && customSections.length > 0 && (
+      customSections.map(sec => sec.content && (
+        <section key={sec.id} className="mb-8">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{sec.title}</h3>
+          <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
+            {sec.content.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
+          </ul>
+        </section>
+      ))
+    ),
+    education: settings.showEducation && education.length > 0 && (
+      <section>
+        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('education')}</h3>
+        <div className="space-y-4">
+          {education.map(edu => (
+            <div key={edu.id}>
+              <h4 className="font-semibold">{edu.institution}</h4>
+              <p className="text-sm text-gray-600">{edu.degree}</p>
+              <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    ),
+    skills: settings.showSkills && skills.length > 0 && (
+      <section>
+        <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('skills')}</h3>
+        <ul className="columns-2 text-sm">
+          {skills.map((skill, index) => (
+            <li key={index} className="mb-1">{skill}</li>
+          ))}
+        </ul>
+      </section>
+    ),
+  };
+  
+  const mainSections = ['profile', 'summary', 'experience', 'projects', 'customSections'];
+  const footerSections = ['education', 'skills'];
+
+  let separatorCount = 0;
+  const shouldRenderSeparator = (currentIndex: number, visibleSections: ResumeSection[]) => {
+    if (currentIndex === visibleSections.length - 1) return false;
+    const currentId = visibleSections[currentIndex];
+    const nextId = visibleSections[currentIndex + 1];
+
+    if ((mainSections.includes(currentId) && footerSections.includes(nextId))) {
+      return true;
+    }
+    if ((sectionComponents[currentId] && sectionComponents[nextId])) {
+      if (mainSections.includes(currentId) && mainSections.includes(nextId)) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const visibleSections = sections.filter(sectionId => sectionComponents[sectionId]);
+  const visibleFooterSections = footerSections.filter(id => visibleSections.includes(id as ResumeSection));
 
   return (
     <div
@@ -19,115 +137,20 @@ export function ResumePreviewMinimalist() {
         fontSize: '11pt',
       }}
     >
-      {settings.showProfile && (
-        <header className="text-center mb-8">
-          <h1 className="text-5xl font-extrabold tracking-tighter">{profile.name}</h1>
-          <h2 className="text-xl text-gray-500 mt-2 font-light tracking-wide">{profile.title}</h2>
-          <div className="flex justify-center items-center gap-x-6 text-xs mt-4 text-gray-500">
-            <span>{profile.phone}</span>
-            <span>{profile.email}</span>
-            <span>{profile.address}</span>
-          </div>
-        </header>
-      )}
+      {visibleSections.filter(s => mainSections.includes(s)).map((sectionId, index, arr) => (
+        <React.Fragment key={sectionId}>
+          {sectionComponents[sectionId]}
+          {shouldRenderSeparator(arr.map(s => s).indexOf(sectionId), arr) && <Separator className="my-8" />}
+        </React.Fragment>
+      ))}
 
-      {settings.showSummary && summary && (
-        <section className="mb-8">
-          <p className="text-center text-sm leading-relaxed max-w-3xl mx-auto">{summary}</p>
-        </section>
-      )}
+      {(visibleFooterSections.length > 0) && <Separator className="my-8" />}
       
-      <Separator className="my-8" />
-
-      {settings.showExperience && experience.length > 0 && (
-        <section className="mb-8">
-          <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('experience')}</h3>
-          <div className="space-y-6">
-            {experience.map(exp => (
-              <div key={exp.id} className="grid grid-cols-4 gap-4">
-                <div className="col-span-1 text-xs text-gray-500">
-                  <p>{exp.startDate} - {exp.endDate}</p>
-                  <p>{exp.location}</p>
-                </div>
-                <div className="col-span-3">
-                  <h4 className="font-semibold">{exp.title}</h4>
-                  <p className="text-sm text-gray-600">{exp.company}</p>
-                  <ul className="mt-2 list-disc list-inside text-sm leading-relaxed space-y-1">
-                    {exp.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {settings.showProjects && projects && projects.length > 0 && (
-        <>
-          <Separator className="my-8" />
-          <section className="mb-8">
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('projects')}</h3>
-            <div className="space-y-5">
-              {projects.map(proj => (
-                <div key={proj.id}>
-                    <div className="flex justify-between items-baseline">
-                        <h4 className="font-semibold">{proj.name}</h4>
-                        <div className="text-xs text-gray-500">{proj.date}</div>
-                    </div>
-                  <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
-                    {proj.description.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
-
-      {settings.showCustomSections && customSections && customSections.length > 0 && (
-        <>
-          <Separator className="my-8" />
-          {customSections.map(sec => (
-            <section key={sec.id} className="mb-8">
-              <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{sec.title}</h3>
-              <ul className="mt-1 list-disc list-inside text-sm leading-relaxed space-y-1">
-                {sec.content.split('\n').map((line, i) => line && <li key={i}>{line.replace(/^- /, '')}</li>)}
-              </ul>
-            </section>
-          ))}
-        </>
-      )}
-
-      <Separator className="my-8" />
-
       <div className="grid grid-cols-2 gap-x-12">
-        {settings.showEducation && education.length > 0 && (
-          <section>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('education')}</h3>
-            <div className="space-y-4">
-              {education.map(edu => (
-                <div key={edu.id}>
-                  <h4 className="font-semibold">{edu.institution}</h4>
-                  <p className="text-sm text-gray-600">{edu.degree}</p>
-                  <p className="text-xs text-gray-500">{edu.startDate} - {edu.endDate}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {settings.showSkills && skills.length > 0 && (
-          <section>
-            <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500 mb-4">{t('skills')}</h3>
-            <ul className="columns-2 text-sm">
-              {skills.map((skill, index) => (
-                <li key={index} className="mb-1">{skill}</li>
-              ))}
-            </ul>
-          </section>
-        )}
+          {visibleFooterSections.map(sectionId => (
+             <div key={sectionId}>{sectionComponents[sectionId]}</div>
+          ))}
       </div>
-
     </div>
   );
 }

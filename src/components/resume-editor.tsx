@@ -37,9 +37,9 @@ const SortableCard = ({ id, children }: { id: string, children: React.ReactNode 
     <div ref={setNodeRef} style={style}>
       <Card>
         <div className="relative">
-          <div {...attributes} {...listeners} className="absolute top-3 right-3 text-muted-foreground cursor-grab">
+          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2">
             <GripVertical />
-          </div>
+          </button>
           {children}
         </div>
       </Card>
@@ -211,7 +211,7 @@ export default function ResumeEditor() {
   const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
     <div className="flex items-center justify-between w-full">
       <CardTitle>{title}</CardTitle>
-      <div className="flex items-center gap-2 mr-8">
+      <div className="flex items-center gap-2 mr-12">
         <Switch
           checked={resumeData.settings[sectionKey]}
           onCheckedChange={() => handleToggleSection(sectionKey)}
@@ -293,7 +293,7 @@ export default function ResumeEditor() {
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
                 <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
                   <div className="flex items-center justify-between w-full">
-                    <span>{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                    <span className="truncate">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -353,7 +353,7 @@ export default function ResumeEditor() {
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
                 <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
                    <div className="flex items-center justify-between w-full">
-                    <span>{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                    <span className="truncate">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -406,7 +406,7 @@ export default function ResumeEditor() {
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
                 <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
                    <div className="flex items-center justify-between w-full">
-                    <span>{proj.name || t('projectName')}</span>
+                    <span className="truncate">{proj.name || t('projectName')}</span>
                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -479,7 +479,7 @@ export default function ResumeEditor() {
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
                 <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
                    <div className="flex items-center justify-between w-full">
-                    <span>{sec.title || t('sectionTitle')}</span>
+                    <span className="truncate">{sec.title || t('sectionTitle')}</span>
                      <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
