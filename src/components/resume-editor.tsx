@@ -15,242 +15,34 @@ import { Switch } from "./ui/switch";
 import type { ResumeSection, ResumeSettings } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from "@dnd-kit/sortable";
 import { CSS } from '@dnd-kit/utilities';
 import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
 
-const SortableCard = ({ id, children }: { id: string, children: React.ReactNode }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
+const SectionHeader = ({ title, sectionKey, onToggle }: { title: string; sectionKey: keyof ResumeSettings; onToggle: (section: keyof ResumeSettings) => void; }) => {
+  const { resumeData } = useResume();
   return (
-    <div ref={setNodeRef} style={style}>
-      <Card>
-        <div className="relative">
-          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2 z-10 hidden md:block">
-            <GripVertical />
-          </button>
-          {children}
-        </div>
-      </Card>
-    </div>
-  );
-};
-
-
-export default function ResumeEditor() {
-  const { resumeData, setResumeData, t } = useResume();
-  const [isPending, startTransition] = useTransition();
-  const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setResumeData(prev => ({ ...prev, profile: { ...prev.profile, [name]: value } }));
-  };
-
-  const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setResumeData(prev => ({ ...prev, summary: e.target.value }));
-  };
-  
-  const handleExperienceChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setResumeData(prev => ({
-      ...prev,
-      experience: prev.experience.map(exp => (exp.id === id ? { ...exp, [name]: value } : exp)),
-    }));
-  };
-
-  const addExperience = () => {
-    setResumeData(prev => ({
-      ...prev,
-      experience: [...prev.experience, { id: `exp${Date.now()}`, title: '', company: '', location: '', startDate: '', endDate: '', description: '' }],
-    }));
-  };
-  
-  const removeExperience = (id: string) => {
-    setResumeData(prev => ({
-      ...prev,
-      experience: prev.experience.filter(exp => exp.id !== id),
-    }));
-  };
-
-  const clearAllExperience = () => {
-    setResumeData(prev => ({ ...prev, experience: [] }));
-  };
-  
-  const handleEducationChange = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setResumeData(prev => ({
-      ...prev,
-      education: prev.education.map(edu => (edu.id === id ? { ...edu, [name]: value } : edu)),
-    }));
-  };
-
-  const addEducation = () => {
-    setResumeData(prev => ({
-      ...prev,
-      education: [...prev.education, { id: `edu${Date.now()}`, degree: '', institution: '', location: '', startDate: '', endDate: '' }],
-    }));
-  };
-  
-  const removeEducation = (id: string) => {
-    setResumeData(prev => ({
-      ...prev,
-      education: prev.education.filter(edu => edu.id !== id),
-    }));
-  };
-
-  const clearAllEducation = () => {
-    setResumeData(prev => ({ ...prev, education: [] }));
-  };
-
-  const handleProjectChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setResumeData(prev => ({
-      ...prev,
-      projects: prev.projects.map(proj => (proj.id === id ? { ...proj, [name]: value } : proj)),
-    }));
-  };
-
-  const addProject = () => {
-    setResumeData(prev => ({
-      ...prev,
-      projects: [...prev.projects, { id: `proj${Date.now()}`, name: '', date: '', description: '' }],
-    }));
-  };
-
-  const removeProject = (id: string) => {
-    setResumeData(prev => ({
-      ...prev,
-      projects: prev.projects.filter(proj => proj.id !== id),
-    }));
-  };
-
-  const clearAllProjects = () => {
-    setResumeData(prev => ({ ...prev, projects: [] }));
-  };
-
-  const handleSkillChange = (index: number, value: string) => {
-    const newSkills = [...resumeData.skills];
-    newSkills[index] = value;
-    setResumeData(prev => ({ ...prev, skills: newSkills }));
-  };
-
-  const addSkill = () => {
-    setResumeData(prev => ({ ...prev, skills: [...prev.skills, ''] }));
-  };
-  
-  const removeSkill = (index: number) => {
-    setResumeData(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== index) }));
-  };
-
-  const clearAllSkills = () => {
-    setResumeData(prev => ({ ...prev, skills: [] }));
-  };
-
-  const handleCustomSectionChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setResumeData(prev => ({
-      ...prev,
-      customSections: prev.customSections.map(sec => (sec.id === id ? { ...sec, [name]: value } : sec)),
-    }));
-  };
-
-  const addCustomSection = () => {
-    setResumeData(prev => ({
-      ...prev,
-      customSections: [...(prev.customSections || []), { id: `custom${Date.now()}`, title: '', content: '' }],
-    }));
-  };
-
-  const removeCustomSection = (id: string) => {
-    setResumeData(prev => ({
-      ...prev,
-      customSections: prev.customSections.filter(sec => sec.id !== id),
-    }));
-  };
-
-  const handleEnhance = (
-    content: string,
-    updater: (enhancedContent: string) => void
-  ) => {
-    startTransition(async () => {
-      const result = await enhanceSectionAction(content, "en");
-      if ("enhancedContent" in result) {
-        updater(result.enhancedContent);
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: result.error,
-        });
-      }
-    });
-  };
-
-  const handleToggleSection = (section: keyof ResumeSettings) => {
-    setResumeData(prev => ({
-      ...prev,
-      settings: {
-        ...prev.settings,
-        [section]: !prev.settings[section],
-      },
-    }));
-  };
-  
-  const SectionHeader = ({ title, sectionKey, onDrag }: { title: string; sectionKey: keyof ResumeSettings, onDrag?: any }) => (
     <div className="flex items-center justify-between w-full">
-      <div className="flex items-center gap-2">
-        <button {...onDrag} className="text-muted-foreground cursor-grab p-2 md:hidden">
-          <GripVertical />
-        </button>
-        <CardTitle>{title}</CardTitle>
-      </div>
+      <CardTitle>{title}</CardTitle>
       <div className="flex items-center gap-2 pr-2">
         <Switch
           checked={resumeData.settings[sectionKey]}
-          onCheckedChange={() => handleToggleSection(sectionKey)}
+          onCheckedChange={() => onToggle(sectionKey)}
           aria-label={`Toggle ${title} section`}
         />
       </div>
     </div>
   );
+};
 
-  const onDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setResumeData((prev) => {
-        const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
-        const newIndex = prev.sections.indexOf(over.id as ResumeSection);
-        const newSections = [...prev.sections];
-        newSections.splice(oldIndex, 1);
-        newSections.splice(newIndex, 0, active.id as ResumeSection);
-        return { ...prev, sections: newSections };
-      });
-    }
-  };
 
-  const sectionComponents: Record<ResumeSection, React.ReactNode> = {
-    profile: (
-      <SortableCard id="profile">
-        <CardHeader>
-           <SectionHeader title={t('profile')} sectionKey="showProfile" />
-        </CardHeader>
+const ProfileEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setResumeData(prev => ({ ...prev, profile: { ...prev.profile, [name]: value } }));
+    };
+    return (
         <CardContent className="space-y-4">
           <PhotoUploader />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -276,34 +68,104 @@ export default function ResumeEditor() {
             </div>
           </div>
         </CardContent>
-      </SortableCard>
-    ),
-    summary: (
-      <SortableCard id="summary">
-        <CardHeader>
-           <SectionHeader title={t('summary')} sectionKey="showSummary" />
-        </CardHeader>
+    )
+}
+
+const SummaryEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    const handleSummaryChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setResumeData(prev => ({ ...prev, summary: e.target.value }));
+    };
+
+    const handleEnhance = (
+        content: string,
+        updater: (enhancedContent: string) => void
+      ) => {
+        startTransition(async () => {
+          const result = await enhanceSectionAction(content, "en");
+          if ("enhancedContent" in result) {
+            updater(result.enhancedContent);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: result.error,
+            });
+          }
+        });
+      };
+
+    return (
         <CardContent className="space-y-2">
-          <Label htmlFor="summary-text" className="sr-only">{t('summary')}</Label>
-          <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} className="text-sm md:text-base"/>
-          <Button variant="outline" size="sm" onClick={() => handleEnhance(resumeData.summary, (content) => setResumeData(p => ({...p, summary: content})))} disabled={isPending}>
-            <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
-          </Button>
+            <Label htmlFor="summary-text" className="sr-only">{t('summary')}</Label>
+            <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} className="text-sm md:text-base"/>
+            <Button variant="outline" size="sm" onClick={() => handleEnhance(resumeData.summary, (content) => setResumeData(p => ({...p, summary: content})))} disabled={isPending}>
+                <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+            </Button>
         </CardContent>
-      </SortableCard>
-    ),
-    experience: (
-      <SortableCard id="experience">
-        <CardHeader>
-           <SectionHeader title={t('experience')} sectionKey="showExperience" />
-        </CardHeader>
+    )
+}
+
+const ExperienceEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    const handleExperienceChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setResumeData(prev => ({
+          ...prev,
+          experience: prev.experience.map(exp => (exp.id === id ? { ...exp, [name]: value } : exp)),
+        }));
+    };
+    
+    const addExperience = () => {
+        setResumeData(prev => ({
+          ...prev,
+          experience: [...prev.experience, { id: `exp${Date.now()}`, title: '', company: '', location: '', startDate: '', endDate: '', description: '' }],
+        }));
+    };
+      
+    const removeExperience = (id: string) => {
+        setResumeData(prev => ({
+          ...prev,
+          experience: prev.experience.filter(exp => exp.id !== id),
+        }));
+    };
+
+    const clearAllExperience = () => {
+      setResumeData(prev => ({ ...prev, experience: [] }));
+    };
+
+    const handleEnhance = (
+        content: string,
+        updater: (enhancedContent: string) => void
+      ) => {
+        startTransition(async () => {
+          const result = await enhanceSectionAction(content, "en");
+          if ("enhancedContent" in result) {
+            updater(result.enhancedContent);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: result.error,
+            });
+          }
+        });
+      };
+
+    return (
         <CardContent>
            <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.experience.map((exp, index) => (
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
-                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="pr-4 flex-1 text-left">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
+                      <span className="pr-4 text-left">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -350,20 +212,46 @@ export default function ResumeEditor() {
               )}
           </div>
         </CardContent>
-      </SortableCard>
-    ),
-    education: (
-      <SortableCard id="education">
-        <CardHeader>
-           <SectionHeader title={t('education')} sectionKey="showEducation" />
-        </CardHeader>
+    )
+}
+
+const EducationEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+
+    const handleEducationChange = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setResumeData(prev => ({
+          ...prev,
+          education: prev.education.map(edu => (edu.id === id ? { ...edu, [name]: value } : edu)),
+        }));
+    };
+    
+    const addEducation = () => {
+        setResumeData(prev => ({
+          ...prev,
+          education: [...prev.education, { id: `edu${Date.now()}`, degree: '', institution: '', location: '', startDate: '', endDate: '' }],
+        }));
+    };
+      
+    const removeEducation = (id: string) => {
+        setResumeData(prev => ({
+          ...prev,
+          education: prev.education.filter(edu => edu.id !== id),
+        }));
+    };
+    
+    const clearAllEducation = () => {
+      setResumeData(prev => ({ ...prev, education: [] }));
+    };
+
+    return (
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.education.map((edu, index) => (
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
-                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="pr-4 flex-1 text-left">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                  <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
+                      <span className="pr-4 text-left">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -403,20 +291,66 @@ export default function ResumeEditor() {
               )}
           </div>
         </CardContent>
-      </SortableCard>
-    ),
-    projects: (
-      <SortableCard id="projects">
-        <CardHeader>
-           <SectionHeader title={t('projects')} sectionKey="showProjects" />
-        </CardHeader>
+    )
+}
+
+const ProjectsEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    const handleProjectChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setResumeData(prev => ({
+          ...prev,
+          projects: prev.projects.map(proj => (proj.id === id ? { ...proj, [name]: value } : proj)),
+        }));
+    };
+    
+    const addProject = () => {
+        setResumeData(prev => ({
+          ...prev,
+          projects: [...prev.projects, { id: `proj${Date.now()}`, name: '', date: '', description: '' }],
+        }));
+    };
+    
+    const removeProject = (id: string) => {
+        setResumeData(prev => ({
+          ...prev,
+          projects: prev.projects.filter(proj => proj.id !== id),
+        }));
+    };
+
+    const clearAllProjects = () => {
+      setResumeData(prev => ({ ...prev, projects: [] }));
+    };
+    
+    const handleEnhance = (
+        content: string,
+        updater: (enhancedContent: string) => void
+      ) => {
+        startTransition(async () => {
+          const result = await enhanceSectionAction(content, "en");
+          if ("enhancedContent" in result) {
+            updater(result.enhancedContent);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: result.error,
+            });
+          }
+        });
+      };
+
+    return (
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.projects.map((proj, index) => (
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="pr-4 flex-1 text-left">{proj.name || t('projectName')}</span>
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
+                        <span className="pr-4 text-left">{proj.name || t('projectName')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -451,13 +385,31 @@ export default function ResumeEditor() {
                 )}
             </div>
         </CardContent>
-      </SortableCard>
-    ),
-    skills: (
-      <SortableCard id="skills">
-        <CardHeader>
-           <SectionHeader title={t('skills')} sectionKey="showSkills" />
-        </CardHeader>
+    )
+}
+
+const SkillsEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    
+    const handleSkillChange = (index: number, value: string) => {
+        const newSkills = [...resumeData.skills];
+        newSkills[index] = value;
+        setResumeData(prev => ({ ...prev, skills: newSkills }));
+    };
+    
+    const addSkill = () => {
+        setResumeData(prev => ({ ...prev, skills: [...prev.skills, ''] }));
+    };
+      
+    const removeSkill = (index: number) => {
+        setResumeData(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== index) }));
+    };
+    
+    const clearAllSkills = () => {
+      setResumeData(prev => ({ ...prev, skills: [] }));
+    };
+
+    return (
         <CardContent className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {resumeData.skills.map((skill, index) => (
@@ -476,20 +428,62 @@ export default function ResumeEditor() {
               )}
             </div>
         </CardContent>
-      </SortableCard>
-    ),
-    customSections: (
-      <SortableCard id="customSections">
-        <CardHeader>
-           <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
-        </CardHeader>
+    )
+}
+
+const CustomSectionsEditor = () => {
+    const { resumeData, setResumeData, t } = useResume();
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    const handleCustomSectionChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setResumeData(prev => ({
+          ...prev,
+          customSections: prev.customSections.map(sec => (sec.id === id ? { ...sec, [name]: value } : sec)),
+        }));
+    };
+    
+    const addCustomSection = () => {
+        setResumeData(prev => ({
+          ...prev,
+          customSections: [...(prev.customSections || []), { id: `custom${Date.now()}`, title: '', content: '' }],
+        }));
+    };
+    
+    const removeCustomSection = (id: string) => {
+        setResumeData(prev => ({
+          ...prev,
+          customSections: prev.customSections.filter(sec => sec.id !== id),
+        }));
+    };
+
+    const handleEnhance = (
+        content: string,
+        updater: (enhancedContent: string) => void
+      ) => {
+        startTransition(async () => {
+          const result = await enhanceSectionAction(content, "en");
+          if ("enhancedContent" in result) {
+            updater(result.enhancedContent);
+          } else {
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: result.error,
+            });
+          }
+        });
+      };
+
+    return (
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
              {resumeData.customSections && resumeData.customSections.map((sec, index) => (
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
-                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="pr-4 flex-1 text-left">{sec.title || t('sectionTitle')}</span>
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex-1">
+                        <span className="pr-4 text-left">{sec.title || t('sectionTitle')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -513,38 +507,132 @@ export default function ResumeEditor() {
           </Accordion>
           <Button variant="outline" onClick={addCustomSection} className="mt-4"><Plus className="mr-2 h-4 w-4" /> {t('addCustomSection')}</Button>
         </CardContent>
-      </SortableCard>
-    ),
+    )
+}
+
+const sectionComponents: Record<ResumeSection, React.ReactNode> = {
+  profile: <ProfileEditor/>,
+  summary: <SummaryEditor/>,
+  experience: <ExperienceEditor/>,
+  education: <EducationEditor/>,
+  projects: <ProjectsEditor/>,
+  skills: <SkillsEditor/>,
+  customSections: <CustomSectionsEditor/>,
+};
+
+const sectionTitles: Record<ResumeSection, string> = {
+    profile: "profile",
+    summary: "summary",
+    experience: "experience",
+    education: "education",
+    projects: "projects",
+    skills: "skills",
+    customSections: "customSections",
+};
+
+const SortableSection = ({ id }: { id: ResumeSection }) => {
+  const { setResumeData, t } = useResume();
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
-  const DraggableResumeEditor = () => (
-     <DndContext
-      collisionDetection={closestCenter}
-      onDragEnd={onDragEnd}
-      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
-    >
-      <SortableContext
-        items={resumeData.sections}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="space-y-6">
-          {resumeData.sections.map((sectionId) => (
-            <div key={sectionId}>{sectionComponents[sectionId]}</div>
-          ))}
+  const handleToggleSection = (section: keyof ResumeSettings) => {
+    setResumeData(prev => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        [section]: !prev.settings[section],
+      },
+    }));
+  };
+  
+  return (
+    <div ref={setNodeRef} style={style} className="touch-none">
+      <Card>
+        <CardHeader className="relative">
+        <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2">
+                <button {...attributes} {...listeners} className="text-muted-foreground cursor-grab p-2">
+                    <GripVertical />
+                </button>
+                <CardTitle>{t(sectionTitles[id])}</CardTitle>
+            </div>
+            <div className="flex items-center gap-2 pr-2">
+                <Switch
+                checked={useResume().resumeData.settings[id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings]}
+                onCheckedChange={() => handleToggleSection(id === 'customSections' ? 'showCustomSections' : `show${id.charAt(0).toUpperCase() + id.slice(1)}` as keyof ResumeSettings)}
+                aria-label={`Toggle ${t(sectionTitles[id])} section`}
+                />
+            </div>
         </div>
-      </SortableContext>
-    </DndContext>
-  )
+        </CardHeader>
+        {sectionComponents[id]}
+      </Card>
+    </div>
+  );
+};
+
+
+const DraggableResumeEditor = () => {
+    const { resumeData, setResumeData } = useResume();
+  
+    const onDragEnd = (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        setResumeData((prev) => {
+            const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
+            const newIndex = prev.sections.indexOf(over.id as ResumeSection);
+            return { ...prev, sections: arrayMove(prev.sections, oldIndex, newIndex) };
+        });
+      }
+    };
+  
+    return (
+       <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={onDragEnd}
+        modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+      >
+        <SortableContext
+          items={resumeData.sections}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-6">
+            {resumeData.sections.map((sectionId) => (
+                <SortableSection key={sectionId} id={sectionId}/>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    )
+}
+
+export default function ResumeEditor() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (!isClient) {
+    // Render a static version on the server to avoid hydration errors
     return (
-      <div className="space-y-6">
-        {resumeData.sections.map((sectionId) => (
-          <div key={sectionId}>{sectionComponents[sectionId]}</div>
-        ))}
-      </div>
+        <div className="space-y-6">
+            {initialSections.map((sectionId) => (
+                <Card key={sectionId}>
+                    <CardHeader>
+                        <CardTitle>{sectionId}</CardTitle>
+                    </CardHeader>
+                </Card>
+            ))}
+        </div>
     );
   }
 
   return <DraggableResumeEditor />;
 }
+
+const initialSections: ResumeSection[] = ['profile', 'summary', 'experience', 'education', 'projects', 'skills', 'customSections'];
