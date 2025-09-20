@@ -303,7 +303,7 @@ export default function ResumeEditor() {
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                      <span className="pr-4 flex-1 text-left">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -343,7 +343,7 @@ export default function ResumeEditor() {
               </AccordionItem>
             ))}
           </Accordion>
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Button variant="outline" onClick={addExperience}><Plus className="mr-2 h-4 w-4" /> {t('addExperience')}</Button>
               {resumeData.experience.length > 0 && (
                   <Button variant="destructive" onClick={clearAllExperience}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
@@ -363,7 +363,7 @@ export default function ResumeEditor() {
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                      <span className="pr-4 flex-1 text-left">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -396,7 +396,7 @@ export default function ResumeEditor() {
               </AccordionItem>
             ))}
           </Accordion>
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
               <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
               {resumeData.education.length > 0 && (
                   <Button variant="destructive" onClick={clearAllEducation}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
@@ -416,7 +416,7 @@ export default function ResumeEditor() {
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="pr-4">{proj.name || t('projectName')}</span>
+                        <span className="pr-4 flex-1 text-left">{proj.name || t('projectName')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -444,7 +444,7 @@ export default function ResumeEditor() {
               </AccordionItem>
             ))}
             </Accordion>
-            <div className="flex gap-2 mt-4">
+            <div className="flex flex-col sm:flex-row gap-2 mt-4">
                 <Button variant="outline" onClick={addProject}><Plus className="mr-2 h-4 w-4" /> {t('addProject')}</Button>
                 {resumeData.projects.length > 0 && (
                     <Button variant="destructive" onClick={clearAllProjects}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
@@ -469,7 +469,7 @@ export default function ResumeEditor() {
                     </div>
                 ))}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
               {resumeData.skills.length > 0 && (
                   <Button variant="destructive" onClick={clearAllSkills}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
@@ -489,7 +489,7 @@ export default function ResumeEditor() {
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="pr-4">{sec.title || t('sectionTitle')}</span>
+                        <span className="pr-4 flex-1 text-left">{sec.title || t('sectionTitle')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
