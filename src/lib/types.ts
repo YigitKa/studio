@@ -52,6 +52,8 @@ export interface ResumeSettings {
   showCustomSections: boolean;
 }
 
+export type ResumeSection = 'profile' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'customSections';
+
 export interface ResumeData {
   profile: ProfileData;
   summary: string;
@@ -61,4 +63,5 @@ export interface ResumeData {
   skills: string[];
   customSections: CustomSectionData[];
   settings: ResumeSettings;
+  sections: ResumeSection[];
 }

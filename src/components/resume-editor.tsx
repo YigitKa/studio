@@ -6,14 +6,47 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { Plus, Sparkles, Trash2 } from "lucide-react";
+import { GripVertical, Plus, Sparkles, Trash2 } from "lucide-react";
 import { PhotoUploader } from "./photo-uploader";
 import { useTransition } from "react";
 import { enhanceSectionAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "./ui/switch";
-import type { ResumeSettings } from "@/lib/types";
+import type { ResumeSection, ResumeSettings } from "@/lib/types";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from '@dnd-kit/utilities';
+import { restrictToVerticalAxis, restrictToWindowEdges } from '@dnd-kit/modifiers';
+
+const SortableCard = ({ id, children }: { id: string, children: React.ReactNode }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <Card>
+        <div className="relative">
+          <div {...attributes} {...listeners} className="absolute top-3 right-3 text-muted-foreground cursor-grab">
+            <GripVertical />
+          </div>
+          {children}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 
 export default function ResumeEditor() {
   const { resumeData, setResumeData, t } = useResume();
@@ -178,7 +211,7 @@ export default function ResumeEditor() {
   const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
     <div className="flex items-center justify-between w-full">
       <CardTitle>{title}</CardTitle>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 mr-8">
         <Switch
           checked={resumeData.settings[sectionKey]}
           onCheckedChange={() => handleToggleSection(sectionKey)}
@@ -188,9 +221,23 @@ export default function ResumeEditor() {
     </div>
   );
 
-  return (
-    <div className="space-y-6">
-      <Card>
+  const onDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (active.id !== over?.id) {
+      setResumeData((prev) => {
+        const oldIndex = prev.sections.indexOf(active.id as ResumeSection);
+        const newIndex = prev.sections.indexOf(over!.id as ResumeSection);
+        const newSections = [...prev.sections];
+        newSections.splice(oldIndex, 1);
+        newSections.splice(newIndex, 0, active.id as ResumeSection);
+        return { ...prev, sections: newSections };
+      });
+    }
+  };
+
+  const sectionComponents: Record<ResumeSection, React.ReactNode> = {
+    profile: (
+      <SortableCard id="profile">
         <CardHeader>
           <SectionHeader title={t('profile')} sectionKey="showProfile" />
         </CardHeader>
@@ -219,9 +266,10 @@ export default function ResumeEditor() {
             </div>
           </div>
         </CardContent>
-      </Card>
-
-      <Card>
+      </SortableCard>
+    ),
+    summary: (
+      <SortableCard id="summary">
         <CardHeader>
           <SectionHeader title={t('summary')} sectionKey="showSummary" />
         </CardHeader>
@@ -232,9 +280,10 @@ export default function ResumeEditor() {
             <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
           </Button>
         </CardContent>
-      </Card>
-      
-      <Card>
+      </SortableCard>
+    ),
+    experience: (
+      <SortableCard id="experience">
         <CardHeader>
           <SectionHeader title={t('experience')} sectionKey="showExperience" />
         </CardHeader>
@@ -291,9 +340,10 @@ export default function ResumeEditor() {
               )}
           </div>
         </CardContent>
-      </Card>
-
-      <Card>
+      </SortableCard>
+    ),
+    education: (
+      <SortableCard id="education">
         <CardHeader>
           <SectionHeader title={t('education')} sectionKey="showEducation" />
         </CardHeader>
@@ -343,9 +393,10 @@ export default function ResumeEditor() {
               )}
           </div>
         </CardContent>
-      </Card>
-      
-      <Card>
+      </SortableCard>
+    ),
+    projects: (
+      <SortableCard id="projects">
         <CardHeader>
           <SectionHeader title={t('projects')} sectionKey="showProjects" />
         </CardHeader>
@@ -390,9 +441,10 @@ export default function ResumeEditor() {
                 )}
             </div>
         </CardContent>
-      </Card>
-      
-      <Card>
+      </SortableCard>
+    ),
+    skills: (
+      <SortableCard id="skills">
         <CardHeader>
           <SectionHeader title={t('skills')} sectionKey="showSkills" />
         </CardHeader>
@@ -414,9 +466,10 @@ export default function ResumeEditor() {
               )}
             </div>
         </CardContent>
-      </Card>
-      
-      <Card>
+      </SortableCard>
+    ),
+    customSections: (
+      <SortableCard id="customSections">
         <CardHeader>
           <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
         </CardHeader>
@@ -450,7 +503,26 @@ export default function ResumeEditor() {
           </Accordion>
           <Button variant="outline" onClick={addCustomSection} className="mt-4"><Plus className="mr-2 h-4 w-4" /> {t('addCustomSection')}</Button>
         </CardContent>
-      </Card>
-    </div>
+      </SortableCard>
+    ),
+  };
+
+  return (
+    <DndContext
+      collisionDetection={closestCenter}
+      onDragEnd={onDragEnd}
+      modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
+    >
+      <SortableContext
+        items={resumeData.sections}
+        strategy={verticalListSortingStrategy}
+      >
+        <div className="space-y-6">
+          {resumeData.sections.map((sectionId) => (
+            <div key={sectionId}>{sectionComponents[sectionId]}</div>
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }
