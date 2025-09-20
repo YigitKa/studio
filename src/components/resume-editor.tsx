@@ -37,7 +37,7 @@ const SortableCard = ({ id, children }: { id: string, children: React.ReactNode 
     <div ref={setNodeRef} style={style}>
       <Card>
         <div className="relative">
-          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2">
+          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2 z-10">
             <GripVertical />
           </button>
           {children}
@@ -214,9 +214,9 @@ export default function ResumeEditor() {
   };
   
   const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
-    <div className="flex items-center justify-between w-full">
+    <div className="flex items-center justify-between w-full pr-12">
       <CardTitle>{title}</CardTitle>
-      <div className="flex items-center gap-2 mr-12">
+      <div className="flex items-center gap-2">
         <Switch
           checked={resumeData.settings[sectionKey]}
           onCheckedChange={() => handleToggleSection(sectionKey)}

@@ -36,13 +36,13 @@ export function PhotoUploader() {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row items-center gap-4">
       <Avatar className="h-20 w-20">
         <AvatarImage src={photoUrl} alt={resumeData.profile.name} />
         <AvatarFallback>{resumeData.profile.name.charAt(0)}</AvatarFallback>
       </Avatar>
-      <div>
-        <Label htmlFor="photo-upload">{t('photo')}</Label>
+      <div className="flex flex-col items-center sm:items-start">
+        <Label htmlFor="photo-upload" className="mb-2 sm:mb-0">{t('photo')}</Label>
         <input
           id="photo-upload"
           type="file"
