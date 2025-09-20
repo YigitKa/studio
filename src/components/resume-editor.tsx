@@ -37,7 +37,7 @@ const SortableCard = ({ id, children }: { id: string, children: React.ReactNode 
     <div ref={setNodeRef} style={style}>
       <Card>
         <div className="relative">
-          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2 z-10">
+          <button {...attributes} {...listeners} className="absolute top-4 right-3 text-muted-foreground cursor-grab p-2 z-10 hidden md:block">
             <GripVertical />
           </button>
           {children}
@@ -213,10 +213,15 @@ export default function ResumeEditor() {
     }));
   };
   
-  const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
-    <div className="flex items-center justify-between w-full pr-12">
-      <CardTitle>{title}</CardTitle>
+  const SectionHeader = ({ title, sectionKey, onDrag }: { title: string; sectionKey: keyof ResumeSettings, onDrag?: any }) => (
+    <div className="flex items-center justify-between w-full">
       <div className="flex items-center gap-2">
+        <button {...onDrag} className="text-muted-foreground cursor-grab p-2 md:hidden">
+          <GripVertical />
+        </button>
+        <CardTitle>{title}</CardTitle>
+      </div>
+      <div className="flex items-center gap-2 pr-2">
         <Switch
           checked={resumeData.settings[sectionKey]}
           onCheckedChange={() => handleToggleSection(sectionKey)}
@@ -244,30 +249,30 @@ export default function ResumeEditor() {
     profile: (
       <SortableCard id="profile">
         <CardHeader>
-          <SectionHeader title={t('profile')} sectionKey="showProfile" />
+           <SectionHeader title={t('profile')} sectionKey="showProfile" />
         </CardHeader>
         <CardContent className="space-y-4">
           <PhotoUploader />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="name">{t('fullName')}</Label>
-              <Input id="name" name="name" value={resumeData.profile.name} onChange={handleProfileChange} />
+              <Input id="name" name="name" value={resumeData.profile.name} onChange={handleProfileChange} className="text-sm md:text-base"/>
             </div>
             <div>
               <Label htmlFor="title">{t('jobTitle')}</Label>
-              <Input id="title" name="title" value={resumeData.profile.title} onChange={handleProfileChange} />
+              <Input id="title" name="title" value={resumeData.profile.title} onChange={handleProfileChange} className="text-sm md:text-base"/>
             </div>
             <div>
               <Label htmlFor="phone">{t('phone')}</Label>
-              <Input id="phone" name="phone" type="tel" value={resumeData.profile.phone} onChange={handleProfileChange} />
+              <Input id="phone" name="phone" type="tel" value={resumeData.profile.phone} onChange={handleProfileChange} className="text-sm md:text-base"/>
             </div>
             <div>
               <Label htmlFor="email">{t('email')}</Label>
-              <Input id="email" name="email" type="email" value={resumeData.profile.email} onChange={handleProfileChange} />
+              <Input id="email" name="email" type="email" value={resumeData.profile.email} onChange={handleProfileChange} className="text-sm md:text-base"/>
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="address">{t('address')}</Label>
-              <Input id="address" name="address" value={resumeData.profile.address} onChange={handleProfileChange} />
+              <Input id="address" name="address" value={resumeData.profile.address} onChange={handleProfileChange} className="text-sm md:text-base"/>
             </div>
           </div>
         </CardContent>
@@ -276,11 +281,11 @@ export default function ResumeEditor() {
     summary: (
       <SortableCard id="summary">
         <CardHeader>
-          <SectionHeader title={t('summary')} sectionKey="showSummary" />
+           <SectionHeader title={t('summary')} sectionKey="showSummary" />
         </CardHeader>
         <CardContent className="space-y-2">
           <Label htmlFor="summary-text" className="sr-only">{t('summary')}</Label>
-          <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} />
+          <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} className="text-sm md:text-base"/>
           <Button variant="outline" size="sm" onClick={() => handleEnhance(resumeData.summary, (content) => setResumeData(p => ({...p, summary: content})))} disabled={isPending}>
             <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
           </Button>
@@ -290,7 +295,7 @@ export default function ResumeEditor() {
     experience: (
       <SortableCard id="experience">
         <CardHeader>
-          <SectionHeader title={t('experience')} sectionKey="showExperience" />
+           <SectionHeader title={t('experience')} sectionKey="showExperience" />
         </CardHeader>
         <CardContent>
            <Accordion type="multiple" className="w-full space-y-4">
@@ -298,7 +303,7 @@ export default function ResumeEditor() {
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="truncate pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                      <span className="pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -308,28 +313,28 @@ export default function ResumeEditor() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`exp-title-${index}`}>{t('jobTitle')}</Label>
-                      <Input id={`exp-title-${index}`} name="title" value={exp.title} onChange={e => handleExperienceChange(exp.id, e)} />
+                      <Input id={`exp-title-${index}`} name="title" value={exp.title} onChange={e => handleExperienceChange(exp.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`exp-company-${index}`}>{t('company')}</Label>
-                      <Input id={`exp-company-${index}`} name="company" value={exp.company} onChange={e => handleExperienceChange(exp.id, e)} />
+                      <Input id={`exp-company-${index}`} name="company" value={exp.company} onChange={e => handleExperienceChange(exp.id, e)} className="text-sm md:text-base"/>
                     </div>
                      <div>
                       <Label htmlFor={`exp-location-${index}`}>{t('location')}</Label>
-                      <Input id={`exp-location-${index}`} name="location" value={exp.location} onChange={e => handleExperienceChange(exp.id, e)} />
+                      <Input id={`exp-location-${index}`} name="location" value={exp.location} onChange={e => handleExperienceChange(exp.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`exp-startDate-${index}`}>{t('startDate')}</Label>
-                      <Input id={`exp-startDate-${index}`} name="startDate" value={exp.startDate} onChange={e => handleExperienceChange(exp.id, e)} />
+                      <Input id={`exp-startDate-${index}`} name="startDate" value={exp.startDate} onChange={e => handleExperienceChange(exp.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`exp-endDate-${index}`}>{t('endDate')}</Label>
-                      <Input id={`exp-endDate-${index}`} name="endDate" value={exp.endDate} onChange={e => handleExperienceChange(exp.id, e)} />
+                      <Input id={`exp-endDate-${index}`} name="endDate" value={exp.endDate} onChange={e => handleExperienceChange(exp.id, e)} className="text-sm md:text-base"/>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor={`exp-desc-${index}`}>{t('description')}</Label>
-                    <Textarea id={`exp-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={exp.description} onChange={e => handleExperienceChange(exp.id, e)} rows={4} />
+                    <Textarea id={`exp-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={exp.description} onChange={e => handleExperienceChange(exp.id, e)} rows={4} className="text-sm md:text-base"/>
                      <Button variant="outline" size="sm" onClick={() => handleEnhance(exp.description, (content) => handleExperienceChange(exp.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
                         <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
                      </Button>
@@ -350,7 +355,7 @@ export default function ResumeEditor() {
     education: (
       <SortableCard id="education">
         <CardHeader>
-          <SectionHeader title={t('education')} sectionKey="showEducation" />
+           <SectionHeader title={t('education')} sectionKey="showEducation" />
         </CardHeader>
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
@@ -358,7 +363,7 @@ export default function ResumeEditor() {
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
                 <div className="flex items-center p-4">
                   <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                      <span className="truncate pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                      <span className="pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
                   </AccordionTrigger>
                   <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                     <Trash2 className="h-4 w-4" />
@@ -368,23 +373,23 @@ export default function ResumeEditor() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`edu-degree-${index}`}>{t('degree')}</Label>
-                      <Input id={`edu-degree-${index}`} name="degree" value={edu.degree} onChange={e => handleEducationChange(edu.id, e)} />
+                      <Input id={`edu-degree-${index}`} name="degree" value={edu.degree} onChange={e => handleEducationChange(edu.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`edu-institution-${index}`}>{t('institution')}</Label>
-                      <Input id={`edu-institution-${index}`} name="institution" value={edu.institution} onChange={e => handleEducationChange(edu.id, e)} />
+                      <Input id={`edu-institution-${index}`} name="institution" value={edu.institution} onChange={e => handleEducationChange(edu.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`edu-location-${index}`}>{t('location')}</Label>
-                      <Input id={`edu-location-${index}`} name="location" value={edu.location} onChange={e => handleEducationChange(edu.id, e)} />
+                      <Input id={`edu-location-${index}`} name="location" value={edu.location} onChange={e => handleEducationChange(edu.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`edu-startDate-${index}`}>{t('startDate')}</Label>
-                      <Input id={`edu-startDate-${index}`} name="startDate" value={edu.startDate} onChange={e => handleEducationChange(edu.id, e)} />
+                      <Input id={`edu-startDate-${index}`} name="startDate" value={edu.startDate} onChange={e => handleEducationChange(edu.id, e)} className="text-sm md:text-base"/>
                     </div>
                      <div>
                       <Label htmlFor={`edu-endDate-${index}`}>{t('endDate')}</Label>
-                      <Input id={`edu-endDate-${index}`} name="endDate" value={edu.endDate} onChange={e => handleEducationChange(edu.id, e)} />
+                      <Input id={`edu-endDate-${index}`} name="endDate" value={edu.endDate} onChange={e => handleEducationChange(edu.id, e)} className="text-sm md:text-base"/>
                     </div>
                   </div>
                 </AccordionContent>
@@ -403,7 +408,7 @@ export default function ResumeEditor() {
     projects: (
       <SortableCard id="projects">
         <CardHeader>
-          <SectionHeader title={t('projects')} sectionKey="showProjects" />
+           <SectionHeader title={t('projects')} sectionKey="showProjects" />
         </CardHeader>
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
@@ -411,7 +416,7 @@ export default function ResumeEditor() {
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="truncate pr-4">{proj.name || t('projectName')}</span>
+                        <span className="pr-4">{proj.name || t('projectName')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -421,16 +426,16 @@ export default function ResumeEditor() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`proj-name-${index}`}>{t('projectName')}</Label>
-                      <Input id={`proj-name-${index}`} name="name" value={proj.name} onChange={e => handleProjectChange(proj.id, e)} />
+                      <Input id={`proj-name-${index}`} name="name" value={proj.name} onChange={e => handleProjectChange(proj.id, e)} className="text-sm md:text-base"/>
                     </div>
                     <div>
                       <Label htmlFor={`proj-date-${index}`}>{t('projectDate')}</Label>
-                      <Input id={`proj-date-${index}`} name="date" value={proj.date} onChange={e => handleProjectChange(proj.id, e)} />
+                      <Input id={`proj-date-${index}`} name="date" value={proj.date} onChange={e => handleProjectChange(proj.id, e)} className="text-sm md:text-base"/>
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor={`proj-desc-${index}`}>{t('description')}</Label>
-                    <Textarea id={`proj-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={proj.description} onChange={e => handleProjectChange(proj.id, e)} rows={4} />
+                    <Textarea id={`proj-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={proj.description} onChange={e => handleProjectChange(proj.id, e)} rows={4} className="text-sm md:text-base"/>
                      <Button variant="outline" size="sm" onClick={() => handleEnhance(proj.description, (content) => handleProjectChange(proj.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
                         <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
                      </Button>
@@ -451,13 +456,13 @@ export default function ResumeEditor() {
     skills: (
       <SortableCard id="skills">
         <CardHeader>
-          <SectionHeader title={t('skills')} sectionKey="showSkills" />
+           <SectionHeader title={t('skills')} sectionKey="showSkills" />
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {resumeData.skills.map((skill, index) => (
                     <div key={index} className="flex items-center gap-2">
-                         <Input placeholder={t('skillPlaceholder')} value={skill} onChange={e => handleSkillChange(index, e.target.value)} />
+                         <Input placeholder={t('skillPlaceholder')} value={skill} onChange={e => handleSkillChange(index, e.target.value)} className="text-sm md:text-base"/>
                          <Button variant="ghost" size="icon" onClick={() => removeSkill(index)}>
                              <Trash2 className="h-4 w-4 text-destructive" />
                          </Button>
@@ -476,7 +481,7 @@ export default function ResumeEditor() {
     customSections: (
       <SortableCard id="customSections">
         <CardHeader>
-          <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
+           <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
         </CardHeader>
         <CardContent>
           <Accordion type="multiple" className="w-full space-y-4">
@@ -484,7 +489,7 @@ export default function ResumeEditor() {
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
                  <div className="flex items-center p-4">
                     <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline flex justify-between">
-                        <span className="truncate pr-4">{sec.title || t('sectionTitle')}</span>
+                        <span className="pr-4">{sec.title || t('sectionTitle')}</span>
                     </AccordionTrigger>
                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
@@ -493,11 +498,11 @@ export default function ResumeEditor() {
                 <AccordionContent className="space-y-4 p-4 pt-0">
                   <div>
                     <Label htmlFor={`custom-title-${index}`}>{t('sectionTitle')}</Label>
-                    <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} />
+                    <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} className="text-sm md:text-base"/>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor={`custom-content-${index}`}>{t('content')}</Label>
-                    <Textarea id={`custom-content-${index}`} name="content" value={sec.content} onChange={e => handleCustomSectionChange(sec.id, e)} rows={4} />
+                    <Textarea id={`custom-content-${index}`} name="content" value={sec.content} onChange={e => handleCustomSectionChange(sec.id, e)} rows={4} className="text-sm md:text-base"/>
                     <Button variant="outline" size="sm" onClick={() => handleEnhance(sec.content, (content) => handleCustomSectionChange(sec.id, { target: { name: 'content', value: content } } as any))} disabled={isPending}>
                       <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
                     </Button>
@@ -512,18 +517,8 @@ export default function ResumeEditor() {
     ),
   };
 
-  if (!isClient) {
-    return (
-      <div className="space-y-6">
-        {resumeData.sections.map((sectionId) => (
-          <div key={sectionId}>{sectionComponents[sectionId]}</div>
-        ))}
-      </div>
-    );
-  }
-
-  return (
-    <DndContext
+  const DraggableResumeEditor = () => (
+     <DndContext
       collisionDetection={closestCenter}
       onDragEnd={onDragEnd}
       modifiers={[restrictToVerticalAxis, restrictToWindowEdges]}
@@ -539,5 +534,17 @@ export default function ResumeEditor() {
         </div>
       </SortableContext>
     </DndContext>
-  );
+  )
+
+  if (!isClient) {
+    return (
+      <div className="space-y-6">
+        {resumeData.sections.map((sectionId) => (
+          <div key={sectionId}>{sectionComponents[sectionId]}</div>
+        ))}
+      </div>
+    );
+  }
+
+  return <DraggableResumeEditor />;
 }
