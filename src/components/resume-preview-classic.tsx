@@ -136,20 +136,34 @@ export function ResumePreviewClassic() {
   return (
     <div 
       id="resume-preview" 
-      className="page-preview bg-white text-gray-800 shadow-2xl w-full max-w-[800px] overflow-auto font-sans transform scale-[0.5] sm:scale-[0.7] md:scale-[0.8] lg:scale-100 origin-top"
+      className="page-preview bg-white text-gray-800 shadow-2xl font-sans"
       style={{
-        width: '210mm',
-        minHeight: '297mm',
-        padding: '16mm',
+        '--scale-factor': '0.7',
+        width: 'calc(210mm * var(--scale-factor))',
+        minHeight: 'calc(297mm * var(--scale-factor))',
+        transform: 'scale(var(--scale-factor))',
+        transformOrigin: 'top center',
+        padding: 'calc(16mm * var(--scale-factor))',
         boxSizing: 'border-box',
-        fontSize: '10pt',
-      }}
+        fontSize: 'calc(10pt * var(--scale-factor))',
+      } as React.CSSProperties}
     >
-      {visibleSections.map(sectionId => (
-        <React.Fragment key={sectionId}>
-          {sectionComponents[sectionId]}
-        </React.Fragment>
-      ))}
+       <div className="a4-content-container" style={{
+            width: '210mm',
+            minHeight: '297mm',
+            padding: '16mm',
+            boxSizing: 'border-box',
+            fontSize: '10pt',
+            transform: 'scale(calc(1 / var(--scale-factor)))',
+            transformOrigin: 'top left',
+            backgroundColor: 'white',
+        }}>
+            {visibleSections.map(sectionId => (
+                <React.Fragment key={sectionId}>
+                {sectionComponents[sectionId]}
+                </React.Fragment>
+            ))}
+      </div>
     </div>
   );
 }
