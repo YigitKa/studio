@@ -25,7 +25,7 @@ export default function Home() {
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
             <TabsContent value="editor">
-              <div className={cn("no-print lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-4 font-poppins mt-4")}>
+              <div className={cn("no-print pr-4 font-poppins mt-4")}>
                 <ResumeEditor />
               </div>
             </TabsContent>
@@ -38,7 +38,7 @@ export default function Home() {
         </div>
 
         {/* Desktop View */}
-        <div className={cn("hidden md:block no-print lg:max-h-[calc(100vh-120px)] lg:overflow-y-auto pr-4 font-poppins")}>
+        <div className={cn("hidden md:block no-print pr-4 font-poppins")}>
           <ResumeEditor />
         </div>
         <div className="hidden md:flex items-start justify-center">
