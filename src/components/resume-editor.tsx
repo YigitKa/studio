@@ -291,15 +291,15 @@ export default function ResumeEditor() {
            <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.experience.map((exp, index) => (
               <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
-                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
-                  <div className="flex items-center justify-between w-full">
-                    <span className="truncate">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
-                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
+                <div className="flex items-center justify-between p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                        <span className="truncate pr-4">{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                    </AccordionTrigger>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 p-4 border-t">
+                </div>
+                <AccordionContent className="space-y-4 p-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`exp-title-${index}`}>{t('jobTitle')}</Label>
@@ -351,15 +351,15 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.education.map((edu, index) => (
                <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
-                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
-                   <div className="flex items-center justify-between w-full">
-                    <span className="truncate">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
-                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
+                <div className="flex items-center justify-between p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                        <span className="truncate pr-4">{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                    </AccordionTrigger>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 p-4 border-t">
+                </div>
+                <AccordionContent className="space-y-4 p-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`edu-degree-${index}`}>{t('degree')}</Label>
@@ -404,15 +404,15 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.projects.map((proj, index) => (
               <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
-                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
-                   <div className="flex items-center justify-between w-full">
-                    <span className="truncate">{proj.name || t('projectName')}</span>
-                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
+                 <div className="flex items-center justify-between p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                        <span className="truncate pr-4">{proj.name || t('projectName')}</span>
+                    </AccordionTrigger>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 p-4 border-t">
+                </div>
+                <AccordionContent className="space-y-4 p-4 pt-0">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor={`proj-name-${index}`}>{t('projectName')}</Label>
@@ -477,15 +477,15 @@ export default function ResumeEditor() {
           <Accordion type="multiple" className="w-full space-y-4">
              {resumeData.customSections && resumeData.customSections.map((sec, index) => (
               <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
-                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
-                   <div className="flex items-center justify-between w-full">
-                    <span className="truncate">{sec.title || t('sectionTitle')}</span>
-                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
+                 <div className="flex items-center justify-between p-4">
+                    <AccordionTrigger className="p-0 text-sm font-semibold w-full hover:no-underline">
+                        <span className="truncate pr-4">{sec.title || t('sectionTitle')}</span>
+                    </AccordionTrigger>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive shrink-0" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="space-y-4 p-4 border-t">
+                </div>
+                <AccordionContent className="space-y-4 p-4 pt-0">
                   <div>
                     <Label htmlFor={`custom-title-${index}`}>{t('sectionTitle')}</Label>
                     <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} />
