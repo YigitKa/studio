@@ -47,6 +47,10 @@ export default function ResumeEditor() {
       experience: prev.experience.filter(exp => exp.id !== id),
     }));
   };
+
+  const clearAllExperience = () => {
+    setResumeData(prev => ({ ...prev, experience: [] }));
+  };
   
   const handleEducationChange = (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,6 +72,10 @@ export default function ResumeEditor() {
       ...prev,
       education: prev.education.filter(edu => edu.id !== id),
     }));
+  };
+
+  const clearAllEducation = () => {
+    setResumeData(prev => ({ ...prev, education: [] }));
   };
 
   const handleProjectChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -92,6 +100,10 @@ export default function ResumeEditor() {
     }));
   };
 
+  const clearAllProjects = () => {
+    setResumeData(prev => ({ ...prev, projects: [] }));
+  };
+
   const handleSkillChange = (index: number, value: string) => {
     const newSkills = [...resumeData.skills];
     newSkills[index] = value;
@@ -104,6 +116,10 @@ export default function ResumeEditor() {
   
   const removeSkill = (index: number) => {
     setResumeData(prev => ({ ...prev, skills: prev.skills.filter((_, i) => i !== index) }));
+  };
+
+  const clearAllSkills = () => {
+    setResumeData(prev => ({ ...prev, skills: [] }));
   };
 
   const handleCustomSectionChange = (id: string, e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -228,7 +244,12 @@ export default function ResumeEditor() {
                 </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={addExperience}><Plus className="mr-2 h-4 w-4" /> {t('addExperience')}</Button>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={addExperience}><Plus className="mr-2 h-4 w-4" /> {t('addExperience')}</Button>
+                {resumeData.experience.length > 0 && (
+                    <Button variant="destructive" onClick={clearAllExperience}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+                )}
+            </div>
           </AccordionContent>
         </AccordionItem>
 
@@ -264,7 +285,12 @@ export default function ResumeEditor() {
                 </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
+                {resumeData.education.length > 0 && (
+                    <Button variant="destructive" onClick={clearAllEducation}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+                )}
+            </div>
           </AccordionContent>
         </AccordionItem>
 
@@ -295,7 +321,12 @@ export default function ResumeEditor() {
                 </Button>
               </div>
             ))}
-            <Button variant="outline" onClick={addProject}><Plus className="mr-2 h-4 w-4" /> {t('addProject')}</Button>
+            <div className="flex gap-2">
+                <Button variant="outline" onClick={addProject}><Plus className="mr-2 h-4 w-4" /> {t('addProject')}</Button>
+                {resumeData.projects.length > 0 && (
+                    <Button variant="destructive" onClick={clearAllProjects}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+                )}
+            </div>
           </AccordionContent>
         </AccordionItem>
         
@@ -312,7 +343,12 @@ export default function ResumeEditor() {
                       </div>
                   ))}
               </div>
-              <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
+                {resumeData.skills.length > 0 && (
+                    <Button variant="destructive" onClick={clearAllSkills}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+                )}
+              </div>
           </AccordionContent>
         </AccordionItem>
 
