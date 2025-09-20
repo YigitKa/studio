@@ -22,7 +22,9 @@ export function ResumePreviewCreative() {
   const { profile, summary, experience, education, projects, skills } = resumeData;
 
   const colors = colorVariants[creativeColor] || colorVariants.green;
-  const headerBg = creativeColor === 'black' ? colors.bg : 'bg-primary';
+  const headerBg = colors.bg;
+  const headerTextColor = creativeColor === 'black' ? 'text-primary-foreground' : 'text-primary-foreground';
+
 
   return (
     <div
@@ -36,10 +38,10 @@ export function ResumePreviewCreative() {
         fontSize: '10pt',
       }}
     >
-      <header className={cn("flex items-center justify-between mb-6 p-6 text-primary-foreground rounded-lg -mx-2", headerBg)}>
+      <header className={cn("flex items-center justify-between mb-6 p-6 rounded-lg -mx-2", headerBg, headerTextColor)}>
         <div className="w-3/4">
           <h1 className="text-4xl font-bold tracking-tight">{profile.name}</h1>
-          <h2 className="text-lg text-primary-foreground/80 mt-1">{profile.title}</h2>
+          <h2 className={cn("text-lg mt-1", creativeColor === 'black' ? 'text-primary-foreground/80' : 'text-primary-foreground/80')}>{profile.title}</h2>
         </div>
         <div className="w-1/4 flex justify-end">
             <Avatar className="w-24 h-24 border-4 border-white">
