@@ -11,7 +11,7 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection, allSections: ResumeS
 
     const isVisible = (sectionId: ResumeSection) => {
         const sectionData = resumeData[sectionId as keyof ResumeData];
-        const settingsKey = `show${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}` as keyof typeof resumeData.settings;
+        const settingsKey = sectionId === 'customSections' ? 'showCustomSections' : `show${sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}` as keyof typeof resumeData.settings;
         
         let isShown = true;
         if (sectionId !== 'profile') {
@@ -22,13 +22,15 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection, allSections: ResumeS
 
         if (Array.isArray(sectionData) && sectionData.length === 0) return false;
         if (typeof sectionData === 'string' && !sectionData) return false;
-        if (sectionId === 'customSections' && resumeData.customSections.every(s => !s.content)) return false;
+        if (sectionId === 'customSections' && (!resumeData.customSections || resumeData.customSections.every(s => !s.content))) return false;
+
 
         return true;
     }
 
     const renderContent = () => {
-        const isFirstVisibleSection = allSections.find(isVisible) === sectionId;
+        const visibleSections = allSections.filter(isVisible);
+        const isFirstVisibleSection = visibleSections[0] === sectionId;
         
         const sectionHeader = (title: string) => (
             <div className="mb-2">
@@ -42,6 +44,7 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection, allSections: ResumeS
                 return (
                     <header data-section-id="profile" className="text-center mb-4 break-inside-avoid">
                         <h1 className="text-3xl font-bold tracking-wider">{profile.name}</h1>
+                        <p className="font-semibold text-lg mt-1">{profile.title}</p>
                         <div className="flex justify-center items-center flex-wrap gap-x-2 text-xs mt-1 text-gray-600">
                             <span>{profile.phone}</span>
                             <span>•</span>
@@ -125,7 +128,7 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection, allSections: ResumeS
             case 'customSections':
                 return (
                      <div data-section-id="customSections">
-                        {customSections.map(sec => sec.content && (
+                        {customSections && customSections.map(sec => sec.content && (
                             <section key={sec.id} className="mb-4 break-inside-avoid">
                                 {sectionHeader(sec.title)}
                                 <ul className="mt-1 list-disc list-inside text-xs leading-relaxed space-y-1">
@@ -165,14 +168,6 @@ export function ResumePreviewClassic() {
     React.useEffect(() => {
         setIsClient(true);
     }, []);
-
-    const allContent = (
-         <div>
-            {resumeData.sections.map(sectionId => (
-                <SectionRenderer key={sectionId} sectionId={sectionId} allSections={resumeData.sections}/>
-            ))}
-        </div>
-    );
     
     if (!isClient) {
         return (
@@ -185,27 +180,16 @@ export function ResumePreviewClassic() {
     }
 
     return (
-        <>
-            <div id="resume-preview-container" className="flex items-start justify-center w-full">
-                <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-[0.6] md:scale-100">
-                    <div className="a4-page-container">
-                        <div className="a4-page">
-                            <div className="a4-content font-sans">
-                                {allContent}
-                            </div>
-                        </div>
+        <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-[0.6] md:scale-100">
+            <div className="a4-page-container">
+                <div className="a4-page">
+                    <div className="a4-content font-sans">
+                        {resumeData.sections.map(sectionId => (
+                            <SectionRenderer key={sectionId} sectionId={sectionId} allSections={resumeData.sections}/>
+                        ))}
                     </div>
                 </div>
             </div>
-
-            {/* Hidden content for accurate printing */}
-            <div id="print-content" className="hidden print:block">
-                 <div className="a4-page">
-                     <div className="a4-content font-sans">
-                        {allContent}
-                    </div>
-                </div>
-            </div>
-        </>
+        </div>
     );
 }
