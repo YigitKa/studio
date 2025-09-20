@@ -6,13 +6,14 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
-import { Plus, Sparkles, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Sparkles, Trash2 } from "lucide-react";
 import { PhotoUploader } from "./photo-uploader";
 import { useTransition } from "react";
 import { enhanceSectionAction } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Switch } from "./ui/switch";
 import type { ResumeSettings } from "@/lib/types";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 export default function ResumeEditor() {
   const { resumeData, setResumeData, t } = useResume();
@@ -176,7 +177,7 @@ export default function ResumeEditor() {
   
   const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof ResumeSettings }) => (
     <div className="flex items-center justify-between w-full">
-      <span>{title}</span>
+      <CardTitle>{title}</CardTitle>
       <div className="flex items-center gap-2">
         <Switch
           checked={resumeData.settings[sectionKey]}
@@ -189,234 +190,267 @@ export default function ResumeEditor() {
 
   return (
     <div className="space-y-6">
-      <Accordion type="multiple" className="w-full">
-        <AccordionItem value="profile">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('profile')} sectionKey="showProfile" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 p-1">
-            <PhotoUploader />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">{t('fullName')}</Label>
-                <Input id="name" name="name" value={resumeData.profile.name} onChange={handleProfileChange} />
-              </div>
-              <div>
-                <Label htmlFor="title">{t('jobTitle')}</Label>
-                <Input id="title" name="title" value={resumeData.profile.title} onChange={handleProfileChange} />
-              </div>
-              <div>
-                <Label htmlFor="phone">{t('phone')}</Label>
-                <Input id="phone" name="phone" type="tel" value={resumeData.profile.phone} onChange={handleProfileChange} />
-              </div>
-              <div>
-                <Label htmlFor="email">{t('email')}</Label>
-                <Input id="email" name="email" type="email" value={resumeData.profile.email} onChange={handleProfileChange} />
-              </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="address">{t('address')}</Label>
-                <Input id="address" name="address" value={resumeData.profile.address} onChange={handleProfileChange} />
-              </div>
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('profile')} sectionKey="showProfile" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <PhotoUploader />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="name">{t('fullName')}</Label>
+              <Input id="name" name="name" value={resumeData.profile.name} onChange={handleProfileChange} />
             </div>
-          </AccordionContent>
-        </AccordionItem>
+            <div>
+              <Label htmlFor="title">{t('jobTitle')}</Label>
+              <Input id="title" name="title" value={resumeData.profile.title} onChange={handleProfileChange} />
+            </div>
+            <div>
+              <Label htmlFor="phone">{t('phone')}</Label>
+              <Input id="phone" name="phone" type="tel" value={resumeData.profile.phone} onChange={handleProfileChange} />
+            </div>
+            <div>
+              <Label htmlFor="email">{t('email')}</Label>
+              <Input id="email" name="email" type="email" value={resumeData.profile.email} onChange={handleProfileChange} />
+            </div>
+            <div className="md:col-span-2">
+              <Label htmlFor="address">{t('address')}</Label>
+              <Input id="address" name="address" value={resumeData.profile.address} onChange={handleProfileChange} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <AccordionItem value="summary">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('summary')} sectionKey="showSummary" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-2 p-1">
-            <Label htmlFor="summary-text">{t('summary')}</Label>
-            <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} />
-            <Button variant="outline" size="sm" onClick={() => handleEnhance(resumeData.summary, (content) => setResumeData(p => ({...p, summary: content})))} disabled={isPending}>
-              <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
-            </Button>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="experience">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-             <SectionHeader title={t('experience')} sectionKey="showExperience" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 p-1">
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('summary')} sectionKey="showSummary" />
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Label htmlFor="summary-text" className="sr-only">{t('summary')}</Label>
+          <Textarea id="summary-text" placeholder={t('summaryPlaceholder')} value={resumeData.summary} onChange={handleSummaryChange} rows={5} />
+          <Button variant="outline" size="sm" onClick={() => handleEnhance(resumeData.summary, (content) => setResumeData(p => ({...p, summary: content})))} disabled={isPending}>
+            <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+          </Button>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('experience')} sectionKey="showExperience" />
+        </CardHeader>
+        <CardContent>
+           <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.experience.map((exp, index) => (
-              <div key={exp.id} className="p-4 border rounded-lg space-y-4 relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor={`exp-title-${index}`}>{t('jobTitle')}</Label>
-                    <Input id={`exp-title-${index}`} name="title" value={exp.title} onChange={e => handleExperienceChange(exp.id, e)} />
+              <AccordionItem value={exp.id} key={exp.id} className="border rounded-lg bg-background">
+                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
+                  <div className="flex items-center justify-between w-full">
+                    <span>{exp.title || t('jobTitle')} at {exp.company || t('company')}</span>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeExperience(exp.id);}}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor={`exp-company-${index}`}>{t('company')}</Label>
-                    <Input id={`exp-company-${index}`} name="company" value={exp.company} onChange={e => handleExperienceChange(exp.id, e)} />
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 p-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`exp-title-${index}`}>{t('jobTitle')}</Label>
+                      <Input id={`exp-title-${index}`} name="title" value={exp.title} onChange={e => handleExperienceChange(exp.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`exp-company-${index}`}>{t('company')}</Label>
+                      <Input id={`exp-company-${index}`} name="company" value={exp.company} onChange={e => handleExperienceChange(exp.id, e)} />
+                    </div>
+                     <div>
+                      <Label htmlFor={`exp-location-${index}`}>{t('location')}</Label>
+                      <Input id={`exp-location-${index}`} name="location" value={exp.location} onChange={e => handleExperienceChange(exp.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`exp-startDate-${index}`}>{t('startDate')}</Label>
+                      <Input id={`exp-startDate-${index}`} name="startDate" value={exp.startDate} onChange={e => handleExperienceChange(exp.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`exp-endDate-${index}`}>{t('endDate')}</Label>
+                      <Input id={`exp-endDate-${index}`} name="endDate" value={exp.endDate} onChange={e => handleExperienceChange(exp.id, e)} />
+                    </div>
                   </div>
-                   <div>
-                    <Label htmlFor={`exp-location-${index}`}>{t('location')}</Label>
-                    <Input id={`exp-location-${index}`} name="location" value={exp.location} onChange={e => handleExperienceChange(exp.id, e)} />
+                  <div className="space-y-2">
+                    <Label htmlFor={`exp-desc-${index}`}>{t('description')}</Label>
+                    <Textarea id={`exp-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={exp.description} onChange={e => handleExperienceChange(exp.id, e)} rows={4} />
+                     <Button variant="outline" size="sm" onClick={() => handleEnhance(exp.description, (content) => handleExperienceChange(exp.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
+                        <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+                     </Button>
                   </div>
-                  <div>
-                    <Label htmlFor={`exp-startDate-${index}`}>{t('startDate')}</Label>
-                    <Input id={`exp-startDate-${index}`} name="startDate" value={exp.startDate} onChange={e => handleExperienceChange(exp.id, e)} />
-                  </div>
-                  <div>
-                    <Label htmlFor={`exp-endDate-${index}`}>{t('endDate')}</Label>
-                    <Input id={`exp-endDate-${index}`} name="endDate" value={exp.endDate} onChange={e => handleExperienceChange(exp.id, e)} />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`exp-desc-${index}`}>{t('description')}</Label>
-                  <Textarea id={`exp-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={exp.description} onChange={e => handleExperienceChange(exp.id, e)} rows={4} />
-                   <Button variant="outline" size="sm" onClick={() => handleEnhance(exp.description, (content) => handleExperienceChange(exp.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
-                      <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
-                   </Button>
-                </div>
-                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeExperience(exp.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-            <div className="flex gap-2">
-                <Button variant="outline" onClick={addExperience}><Plus className="mr-2 h-4 w-4" /> {t('addExperience')}</Button>
-                {resumeData.experience.length > 0 && (
-                    <Button variant="destructive" onClick={clearAllExperience}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
-                )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+          </Accordion>
+          <div className="flex gap-2 mt-4">
+              <Button variant="outline" onClick={addExperience}><Plus className="mr-2 h-4 w-4" /> {t('addExperience')}</Button>
+              {resumeData.experience.length > 0 && (
+                  <Button variant="destructive" onClick={clearAllExperience}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+              )}
+          </div>
+        </CardContent>
+      </Card>
 
-        <AccordionItem value="education">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('education')} sectionKey="showEducation" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 p-1">
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('education')} sectionKey="showEducation" />
+        </CardHeader>
+        <CardContent>
+          <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.education.map((edu, index) => (
-              <div key={edu.id} className="p-4 border rounded-lg space-y-4 relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor={`edu-degree-${index}`}>{t('degree')}</Label>
-                    <Input id={`edu-degree-${index}`} name="degree" value={edu.degree} onChange={e => handleEducationChange(edu.id, e)} />
+               <AccordionItem value={edu.id} key={edu.id} className="border rounded-lg bg-background">
+                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
+                   <div className="flex items-center justify-between w-full">
+                    <span>{edu.degree || t('degree')} at {edu.institution || t('institution')}</span>
+                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeEducation(edu.id);}}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor={`edu-institution-${index}`}>{t('institution')}</Label>
-                    <Input id={`edu-institution-${index}`} name="institution" value={edu.institution} onChange={e => handleEducationChange(edu.id, e)} />
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 p-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`edu-degree-${index}`}>{t('degree')}</Label>
+                      <Input id={`edu-degree-${index}`} name="degree" value={edu.degree} onChange={e => handleEducationChange(edu.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`edu-institution-${index}`}>{t('institution')}</Label>
+                      <Input id={`edu-institution-${index}`} name="institution" value={edu.institution} onChange={e => handleEducationChange(edu.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`edu-location-${index}`}>{t('location')}</Label>
+                      <Input id={`edu-location-${index}`} name="location" value={edu.location} onChange={e => handleEducationChange(edu.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`edu-startDate-${index}`}>{t('startDate')}</Label>
+                      <Input id={`edu-startDate-${index}`} name="startDate" value={edu.startDate} onChange={e => handleEducationChange(edu.id, e)} />
+                    </div>
+                     <div>
+                      <Label htmlFor={`edu-endDate-${index}`}>{t('endDate')}</Label>
+                      <Input id={`edu-endDate-${index}`} name="endDate" value={edu.endDate} onChange={e => handleEducationChange(edu.id, e)} />
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor={`edu-location-${index}`}>{t('location')}</Label>
-                    <Input id={`edu-location-${index}`} name="location" value={edu.location} onChange={e => handleEducationChange(edu.id, e)} />
-                  </div>
-                  <div>
-                    <Label htmlFor={`edu-startDate-${index}`}>{t('startDate')}</Label>
-                    <Input id={`edu-startDate-${index}`} name="startDate" value={edu.startDate} onChange={e => handleEducationChange(edu.id, e)} />
-                  </div>
-                   <div>
-                    <Label htmlFor={`edu-endDate-${index}`}>{t('endDate')}</Label>
-                    <Input id={`edu-endDate-${index}`} name="endDate" value={edu.endDate} onChange={e => handleEducationChange(edu.id, e)} />
-                  </div>
-                </div>
-                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeEducation(edu.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-            <div className="flex gap-2">
-                <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
-                {resumeData.education.length > 0 && (
-                    <Button variant="destructive" onClick={clearAllEducation}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
-                )}
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="projects">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('projects')} sectionKey="showProjects" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 p-1">
+          </Accordion>
+          <div className="flex gap-2 mt-4">
+              <Button variant="outline" onClick={addEducation}><Plus className="mr-2 h-4 w-4" /> {t('addEducation')}</Button>
+              {resumeData.education.length > 0 && (
+                  <Button variant="destructive" onClick={clearAllEducation}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+              )}
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('projects')} sectionKey="showProjects" />
+        </CardHeader>
+        <CardContent>
+          <Accordion type="multiple" className="w-full space-y-4">
             {resumeData.projects.map((proj, index) => (
-              <div key={proj.id} className="p-4 border rounded-lg space-y-4 relative">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor={`proj-name-${index}`}>{t('projectName')}</Label>
-                    <Input id={`proj-name-${index}`} name="name" value={proj.name} onChange={e => handleProjectChange(proj.id, e)} />
+              <AccordionItem value={proj.id} key={proj.id} className="border rounded-lg bg-background">
+                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
+                   <div className="flex items-center justify-between w-full">
+                    <span>{proj.name || t('projectName')}</span>
+                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeProject(proj.id);}}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor={`proj-date-${index}`}>{t('projectDate')}</Label>
-                    <Input id={`proj-date-${index}`} name="date" value={proj.date} onChange={e => handleProjectChange(proj.id, e)} />
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 p-4 border-t">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor={`proj-name-${index}`}>{t('projectName')}</Label>
+                      <Input id={`proj-name-${index}`} name="name" value={proj.name} onChange={e => handleProjectChange(proj.id, e)} />
+                    </div>
+                    <div>
+                      <Label htmlFor={`proj-date-${index}`}>{t('projectDate')}</Label>
+                      <Input id={`proj-date-${index}`} name="date" value={proj.date} onChange={e => handleProjectChange(proj.id, e)} />
+                    </div>
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`proj-desc-${index}`}>{t('description')}</Label>
-                  <Textarea id={`proj-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={proj.description} onChange={e => handleProjectChange(proj.id, e)} rows={4} />
-                   <Button variant="outline" size="sm" onClick={() => handleEnhance(proj.description, (content) => handleProjectChange(proj.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
-                      <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
-                   </Button>
-                </div>
-                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeProject(proj.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`proj-desc-${index}`}>{t('description')}</Label>
+                    <Textarea id={`proj-desc-${index}`} name="description" placeholder={t('descriptionPlaceholder')} value={proj.description} onChange={e => handleProjectChange(proj.id, e)} rows={4} />
+                     <Button variant="outline" size="sm" onClick={() => handleEnhance(proj.description, (content) => handleProjectChange(proj.id, { target: { name: 'description', value: content } } as any))} disabled={isPending}>
+                        <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+                     </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-            <div className="flex gap-2">
+            </Accordion>
+            <div className="flex gap-2 mt-4">
                 <Button variant="outline" onClick={addProject}><Plus className="mr-2 h-4 w-4" /> {t('addProject')}</Button>
                 {resumeData.projects.length > 0 && (
                     <Button variant="destructive" onClick={clearAllProjects}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
                 )}
             </div>
-          </AccordionContent>
-        </AccordionItem>
-        
-        <AccordionItem value="skills">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('skills')} sectionKey="showSkills" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-4 p-1">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {resumeData.skills.map((skill, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                           <Input placeholder={t('skillPlaceholder')} value={skill} onChange={e => handleSkillChange(index, e.target.value)} />
-                           <Button variant="ghost" size="icon" onClick={() => removeSkill(index)}>
-                               <Trash2 className="h-4 w-4 text-destructive" />
-                           </Button>
-                      </div>
-                  ))}
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
-                {resumeData.skills.length > 0 && (
-                    <Button variant="destructive" onClick={clearAllSkills}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
-                )}
-              </div>
-          </AccordionContent>
-        </AccordionItem>
-
-        <AccordionItem value="customSections">
-          <AccordionTrigger className="text-lg font-semibold w-full">
-            <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
-          </AccordionTrigger>
-          <AccordionContent className="space-y-6 p-1">
-            {resumeData.customSections && resumeData.customSections.map((sec, index) => (
-              <div key={sec.id} className="p-4 border rounded-lg space-y-4 relative">
-                <div>
-                  <Label htmlFor={`custom-title-${index}`}>{t('sectionTitle')}</Label>
-                  <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor={`custom-content-${index}`}>{t('content')}</Label>
-                  <Textarea id={`custom-content-${index}`} name="content" value={sec.content} onChange={e => handleCustomSectionChange(sec.id, e)} rows={4} />
-                  <Button variant="outline" size="sm" onClick={() => handleEnhance(sec.content, (content) => handleCustomSectionChange(sec.id, { target: { name: 'content', value: content } } as any))} disabled={isPending}>
-                    <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
-                  </Button>
-                </div>
-                <Button variant="destructive" size="sm" className="absolute top-2 right-2" onClick={() => removeCustomSection(sec.id)}>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('skills')} sectionKey="showSkills" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {resumeData.skills.map((skill, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                         <Input placeholder={t('skillPlaceholder')} value={skill} onChange={e => handleSkillChange(index, e.target.value)} />
+                         <Button variant="ghost" size="icon" onClick={() => removeSkill(index)}>
+                             <Trash2 className="h-4 w-4 text-destructive" />
+                         </Button>
+                    </div>
+                ))}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={addSkill}><Plus className="mr-2 h-4 w-4" /> {t('addSkill')}</Button>
+              {resumeData.skills.length > 0 && (
+                  <Button variant="destructive" onClick={clearAllSkills}><Trash2 className="mr-2 h-4 w-4" /> Clear All</Button>
+              )}
+            </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <SectionHeader title={t('customSections')} sectionKey="showCustomSections" />
+        </CardHeader>
+        <CardContent>
+          <Accordion type="multiple" className="w-full space-y-4">
+             {resumeData.customSections && resumeData.customSections.map((sec, index) => (
+              <AccordionItem value={sec.id} key={sec.id} className="border rounded-lg bg-background">
+                <AccordionTrigger className="p-4 text-sm font-semibold w-full hover:no-underline">
+                   <div className="flex items-center justify-between w-full">
+                    <span>{sec.title || t('sectionTitle')}</span>
+                     <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive mr-2" onClick={(e) => { e.stopPropagation(); removeCustomSection(sec.id);}}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="space-y-4 p-4 border-t">
+                  <div>
+                    <Label htmlFor={`custom-title-${index}`}>{t('sectionTitle')}</Label>
+                    <Input id={`custom-title-${index}`} name="title" value={sec.title} onChange={e => handleCustomSectionChange(sec.id, e)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor={`custom-content-${index}`}>{t('content')}</Label>
+                    <Textarea id={`custom-content-${index}`} name="content" value={sec.content} onChange={e => handleCustomSectionChange(sec.id, e)} rows={4} />
+                    <Button variant="outline" size="sm" onClick={() => handleEnhance(sec.content, (content) => handleCustomSectionChange(sec.id, { target: { name: 'content', value: content } } as any))} disabled={isPending}>
+                      <Sparkles className="mr-2 h-4 w-4" /> {isPending ? t('enhancing') : t('enhanceWithAI')}
+                    </Button>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-            <Button variant="outline" onClick={addCustomSection}><Plus className="mr-2 h-4 w-4" /> {t('addCustomSection')}</Button>
-          </AccordionContent>
-        </AccordionItem>
-
-      </Accordion>
+          </Accordion>
+          <Button variant="outline" onClick={addCustomSection} className="mt-4"><Plus className="mr-2 h-4 w-4" /> {t('addCustomSection')}</Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

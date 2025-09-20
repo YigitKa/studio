@@ -20,10 +20,10 @@ export default function Header() {
   };
 
   return (
-    <header className="flex items-center justify-between p-4 border-b bg-card no-print sticky top-0 z-10">
+    <header className="flex items-center justify-between p-4 border-b bg-background no-print sticky top-0 z-10">
       <div className="flex items-center gap-2">
         <Sparkles className="h-6 w-6 text-accent" />
-        <h1 className="text-xl font-bold text-primary">{t("title")}</h1>
+        <h1 className="text-xl font-bold text-foreground">{t("title")}</h1>
       </div>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
