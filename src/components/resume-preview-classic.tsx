@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -135,7 +136,7 @@ export function ResumePreviewClassic() {
   return (
     <div 
       id="resume-preview" 
-      className="page-preview bg-white text-gray-800 shadow-2xl w-full max-w-[800px] overflow-auto font-sans transform scale-[0.8] lg:scale-100 origin-top"
+      className="page-preview bg-white text-gray-800 shadow-2xl w-full max-w-[800px] overflow-auto font-sans transform scale-[0.5] sm:scale-[0.7] md:scale-[0.8] lg:scale-100 origin-top"
       style={{
         width: '210mm',
         minHeight: '297mm',
