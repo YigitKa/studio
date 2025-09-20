@@ -4,7 +4,6 @@
 import * as React from "react";
 import { useResume } from "@/contexts/resume-context";
 import type { ResumeData, ResumeSection } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
 const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) => {
     const { resumeData, t } = useResume();
@@ -136,51 +135,11 @@ const SectionRenderer: React.FC<{ sectionId: ResumeSection }> = ({ sectionId }) 
 
 export function ResumePreviewClassic() {
     const { resumeData } = useResume();
-    const [pages, setPages] = React.useState<React.ReactNode[]>([]);
-    const contentRef = React.useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = React.useState(false);
 
     React.useEffect(() => {
         setIsClient(true);
     }, []);
-
-    React.useEffect(() => {
-        if (!isClient || !contentRef.current) return;
-
-        const contentEl = contentRef.current;
-        const A4_HEIGHT_PX = 1122.5; 
-        const PADDING_PX = 60.5;
-        const USABLE_HEIGHT = A4_HEIGHT_PX - PADDING_PX * 2;
-        
-        const allSections = Array.from(contentEl.children) as HTMLElement[];
-        let currentPage: HTMLElement[] = [];
-        let currentPageHeight = 0;
-        const newPages: React.ReactNode[] = [];
-
-        const createPage = (nodes: HTMLElement[], key: number) => (
-            <div key={key} className="a4-page">
-                <div className="a4-content" dangerouslySetInnerHTML={{ __html: nodes.map(n => n.outerHTML).join('') }} />
-            </div>
-        );
-
-        allSections.forEach((section) => {
-            const sectionHeight = section.offsetHeight;
-            if (currentPageHeight + sectionHeight > USABLE_HEIGHT && currentPage.length > 0) {
-                newPages.push(createPage(currentPage, newPages.length));
-                currentPage = [];
-                currentPageHeight = 0;
-            }
-            currentPage.push(section);
-            currentPageHeight += sectionHeight;
-        });
-
-        if (currentPage.length > 0) {
-            newPages.push(createPage(currentPage, newPages.length));
-        }
-
-        setPages(newPages);
-
-    }, [resumeData, isClient]);
 
     const allContent = (
         <>
@@ -208,28 +167,19 @@ export function ResumePreviewClassic() {
         return (
              <div className="page-container">
                 <div className="a4-page">
-                    <div className="a4-content">
-                        {/* Render a placeholder or loader */}
-                    </div>
+                    <div className="a4-content" />
                 </div>
             </div>
         )
     }
 
     return (
-        <>
-            <div ref={contentRef} className="absolute -z-50 opacity-0 pointer-events-none w-[210mm] p-[16mm] box-border">
-                {allContent}
+        <div className="page-container relative w-[210mm] max-w-full origin-top scale-[0.4] sm:scale-100">
+            <div className="a4-page">
+                <div className="a4-content">
+                    {allContent}
+                </div>
             </div>
-            <div id="resume-preview" className="page-container space-y-4">
-                {pages.length > 0 ? pages : (
-                    <div className="a4-page">
-                        <div className="a4-content">
-                            {/* Loading or empty state */}
-                        </div>
-                    </div>
-                )}
-            </div>
-        </>
+        </div>
     );
 }
