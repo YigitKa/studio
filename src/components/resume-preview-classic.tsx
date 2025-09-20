@@ -5,7 +5,7 @@ import * as React from "react";
 import { useResume } from "@/contexts/resume-context";
 import type { ResumeSection } from "@/lib/types";
 
-export function ResumePreviewClassic({ zoom }: { zoom: number }) {
+export function ResumePreviewClassic() {
   const { resumeData, t } = useResume();
   const { profile, summary, experience, education, skills, projects, customSections, settings, sections } = resumeData;
 
@@ -137,24 +137,8 @@ export function ResumePreviewClassic({ zoom }: { zoom: number }) {
     <div 
       id="resume-preview" 
       className="page-preview bg-white text-gray-800 shadow-2xl font-sans"
-      style={{
-        '--scale-factor': zoom,
-        width: 'calc(210mm * var(--scale-factor))',
-        height: 'calc(297mm * var(--scale-factor))',
-        transform: 'scale(var(--scale-factor))',
-        transformOrigin: 'top center',
-      } as React.CSSProperties}
     >
-       <div className="a4-content-container" style={{
-            width: '210mm',
-            height: '297mm',
-            padding: '16mm',
-            boxSizing: 'border-box',
-            fontSize: '10pt',
-            transform: 'scale(calc(1 / var(--scale-factor)))',
-            transformOrigin: 'top left',
-            backgroundColor: 'white',
-        }}>
+       <div className="a4-content-container">
             {visibleSections.map(sectionId => (
                 <React.Fragment key={sectionId}>
                 {sectionComponents[sectionId]}
