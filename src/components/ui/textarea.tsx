@@ -14,8 +14,17 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
     };
 
     React.useEffect(() => {
-      adjustHeight();
+      if (internalRef.current) {
+        adjustHeight();
+      }
     }, [props.value]);
+
+    const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+      adjustHeight();
+      if (props.onInput) {
+        props.onInput(e);
+      }
+    };
 
     return (
       <textarea
@@ -24,7 +33,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, React.ComponentProps<'tex
           className
         )}
         ref={internalRef}
-        onInput={adjustHeight}
+        onInput={handleInput}
         {...props}
       />
     );
